@@ -1,0 +1,55 @@
+﻿@using GitTime.Web.Models.Database
+
+@{
+    var _dataSource = (ICollection<TimecardFinderRow>)ViewBag.DataSource;
+    var _isAdded = (bool?)ViewBag.IsAdded ?? false;
+}
+
+@if (_isAdded)
+{
+    <div class="alert alert-success alert-dismissible" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        New timecard successfully created.
+    </div>
+}
+
+<p>
+    <button id="NewTimecardButton" type="button" class="btn btn-primary" data-toggle="modal" data-target="#Editor" onclick="_editor.showCreator();">
+        New Timecard
+    </button>
+
+    <div id="EditorPlaceholder"></div>
+</p>
+
+@if (_dataSource.Count > 0)
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Person</th>
+                <th>Repo</th>
+                <th>Company</th>
+                <th>Description</th>
+                <th>Hours</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (TimecardFinderRow row in _dataSource)
+            {
+                <tr>
+                    <td>@string.Format("{0:MMM d, yyyy}", row.EntryDate)</td>
+                    <td>@row.PersonName</td>
+                    <td>@row.Repository</td>
+                    <td>@row.CompanyName</td>
+                    <td>@row.IssueDescription</td>
+                    <td>@string.Format("{0:n2}", row.Hours)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <strong>There are currently no timecards.</strong>
+}

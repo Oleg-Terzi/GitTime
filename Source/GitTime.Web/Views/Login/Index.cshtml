@@ -1,0 +1,40 @@
+﻿@model GitTime.Web.Models.View.LoginModel
+
+@{
+    ViewBag.Title = "Login";
+
+    Layout = "~/Views/Shared/_LayoutLogin.cshtml";
+}
+
+<div class="login text-center">
+    <div>
+
+        @Html.Partial("_AlertError")
+
+        <h3>Welcome to GitTime</h3>
+        <p>Please enter your login credentials.<br />Access is restricted to authorized users only. </p>
+
+        @using (Html.BeginForm(null, null, new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+        {
+            @Html.AntiForgeryToken()
+            <div class="form-group">
+                @Html.TextBoxFor(x => x.Email, new { placeholder = "Email", @class = "form-control" })
+            </div>
+            <div class="form-group">
+                @Html.PasswordFor(x => x.Password, new { placeholder = "Password", @class = "form-control" })
+            </div>
+            <div class="form-group">
+                @Html.CheckBoxFor(x => x.RememberMe, new { @class = "i-checks" }) Remember me
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Login</button>
+            </div>
+
+            <a href="@Url.Action("ForgotPassword", "Login")"><small>Forgot your password?</small></a>
+            <p class="text-muted text-center"><small>Do not have an account?</small></p>
+            
+            <a class="btn btn-default btn-sm" href="@Url.Action("Register", "Login")">Register a new account</a>
+        }
+    </div>
+</div>

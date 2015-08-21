@@ -1,0 +1,132 @@
+﻿@using GitTime.Web.Models.View.Timecard
+
+@model FindModel
+
+@{
+    ViewBag.Title = "Timecards";
+}
+
+@section Scripts
+{
+    <script>
+    $(function () {
+        $("input[type='date']").datepicker({
+            changeMonth: true,
+            changeYear: true
+        });
+
+        $('#ui-datepicker-div').click(function (e) {
+            e.stopPropagation();
+        });
+    });
+
+    var _editor = {
+        showEditor: function (id) {
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("Edit", "Timecard")',
+                success: function (data) {
+                    _editor._init(data);
+                },
+                error: function (xhr) {
+                    var newDoc = document.open("text/html", "replace");
+                    newDoc.write(xhr.responseText);
+                    newDoc.close();
+                },
+            });
+        },
+
+        showCreator: function () {
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("Create", "Timecard")',
+                success: function (data) {
+                    _editor._init(data);
+                },
+                error: function (xhr) {
+                    var newDoc = document.open("text/html", "replace");
+                    newDoc.write(xhr.responseText);
+                    newDoc.close();
+                },
+            });
+        },
+
+        save: function () {
+            var form = $("#Editor form");
+
+            form.validate();
+
+            if (!form.valid()) {
+                form.children(".alert-danger").show();
+                return;
+            }
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("Save", "Timecard")',
+                data: form.serialize(),
+                success: function (data) {
+                    $('#SearchResultsPlaceholder').html(data);
+                    $("#Editor").modal("hide");
+                },
+                error: function (xhr) {
+                    _editor._init(xhr.responseText);
+
+                    $("#Editor form .alert-danger").show();
+                },
+            });
+        },
+
+        _init: function (data) {
+            $('#EditorPlaceholder').html(data);
+
+            $("#Editor input[type='date']").datepicker({
+                changeMonth: true,
+                changeYear: true
+            });
+
+            $.validator.unobtrusive.parse("#Editor form");
+
+            $("#Editor").modal("show");
+        },
+    }
+</script>
+}
+
+@section SearchCriteria
+{
+    <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Search <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+            <li>
+                <div class="search-criteria">
+                    @using (Html.BeginForm(null, null, null, FormMethod.Post, new { role = "form" }))
+                    {
+                        <div class="form-group">
+                            @Html.TextBoxFor(x => x.ProjectName, new { placeholder = "Project", @class = "form-control input-sm" })
+                        </div>
+                        <div class="form-group">
+                            @Html.TextBoxFor(x => x.PersonName, new { placeholder = "Person", @class = "form-control input-sm" })
+                        </div>
+                        <div class="form-group">
+                            @Html.TextBoxFor(x => x.DateEntryFrom, new { type = "date", placeholder = "From", @class = "form-control input-sm date-range" })
+                            <span class="date-range-to">to</span>
+                            @Html.TextBoxFor(x => x.DateEntryThru, new { type = "date", placeholder = "Thru", @class = "form-control input-sm date-range" })
+                        </div>
+
+                        <div class="form-group buttons">
+                            <button name="action" value="search" type="submit" class="btn btn-primary btn-sm">Search</button>
+                            <button name="action" value="clear" type="submit" class="btn btn-default btn-sm">Clear</button>
+                        </div>
+                    }
+                </div>
+            </li>
+        </ul>
+    </li>
+}
+
+<h1 class="page-header">Timecards</h1>
+
+<div id="SearchResultsPlaceholder">
+    @Html.Partial("SearchResults")
+</div>

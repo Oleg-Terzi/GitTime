@@ -1,0 +1,16 @@
+*.boltdata
+*.dbmdl
+*.nupkg
+*.rdl.data
+*.suo
+*.tdf
+*.user
+*.VisualState.xml
+*.pdb
+bin
+Build/Packages
+Library/Packages
+NDependOut
+obj
+Source/Packages
+StyleCop.Cache
