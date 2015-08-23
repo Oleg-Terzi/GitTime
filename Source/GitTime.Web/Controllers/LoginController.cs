@@ -26,7 +26,7 @@ namespace GitTime.Web.Controllers
 
             Person user;
 
-            using (var db = new TimeTrackerContext())
+            using (var db = new GitTimeContext())
             {
                 user = (
                     db.Persons

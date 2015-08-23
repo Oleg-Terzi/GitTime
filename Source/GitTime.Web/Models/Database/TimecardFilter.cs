@@ -2,6 +2,7 @@
 
 namespace GitTime.Web.Models.Database
 {
+    [Serializable]
     public class TimecardFilter
     {
         public string ProjectName { get; set; }

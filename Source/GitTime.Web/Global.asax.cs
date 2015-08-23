@@ -13,7 +13,7 @@ namespace GitTime.Web
     {
         protected void Application_Start()
         {
-            Database.SetInitializer(new TimeTrackerDbInitializer());
+            Database.SetInitializer(new GitTimeDbInitializer());
 
             AreaRegistration.RegisterAllAreas();
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);

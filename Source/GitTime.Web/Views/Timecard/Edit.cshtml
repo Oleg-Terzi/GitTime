@@ -1,6 +1,6 @@
-﻿@using GitTime.Web.Models.View.Timecard
+﻿@using GitTime.Web.Models.View
 
-@model EditModel
+@model FindModel
 
 @{
     var _errorMessage = (string)ViewBag.ErrorMessage;
@@ -13,7 +13,7 @@
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 <h4 class="modal-title" id="EditorTitle">
-                    @(Model.ID.HasValue ? "Edit Timecard": "New Timecard")
+                    @(Model.Edit.ID.HasValue ? "Edit Timecard": "New Timecard")
                 </h4>
             </div>
             <div class="modal-body">
@@ -31,23 +31,23 @@
                         }
                     </div>
                     
-                    @Html.HiddenFor(x => x.ID)
+                    @Html.HiddenFor(x => x.Edit.ID)
                     
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
                                 @Html.Label("Date", new { @class = "control-label col-md-4" })
                                 <div class="col-md-8">
-                                    @Html.TextBoxFor(x => x.EntryDate, "{0:MM\\/dd\\/yyyy}", new { type = "date", @class = "form-control" })
-                                    @{ Html.ValidateFor(x => x.EntryDate); }
+                                    @Html.TextBoxFor(x => x.Edit.EntryDate, "{0:MM\\/dd\\/yyyy}", new { type = "date", @class = "form-control" })
+                                    @{ Html.ValidateFor(x => x.Edit.EntryDate); }
                                 </div>
                             </div>
 
                             <div class="form-group">
                                 @Html.Label("Person", new { @class = "control-label col-md-4" })
                                 <div class="col-md-8">
-                                    @Html.TextBoxFor(x => x.PersonFullName, new { @class = "form-control" })
-                                    @{ Html.ValidateFor(x => x.PersonFullName); }
+                                    @Html.PersonSelectorFor(x => x.Edit.PersonContactID)
+                                    @{ Html.ValidateFor(x => x.Edit.PersonContactID); }
                                 </div>
                             </div>
                         </div>
@@ -55,16 +55,16 @@
                             <div class="form-group">
                                 @Html.Label("Issue #", new { @class = "control-label col-md-4" })
                                 <div class="col-md-8">
-                                    @Html.TextBoxFor(x => x.IssueNumber, new { type = "number", @class = "form-control" })
-                                    @{ Html.ValidateFor(x => x.IssueNumber); }
+                                    @Html.TextBoxFor(x => x.Edit.IssueNumber, new { type = "number", @class = "form-control" })
+                                    @{ Html.ValidateFor(x => x.Edit.IssueNumber); }
                                 </div>
                             </div>
 
                             <div class="form-group">
                                 @Html.Label("Hours", new { @class = "control-label col-md-4" })
                                 <div class="col-md-8">
-                                    @Html.TextBoxFor(x => x.Hours, new { type = "number", @class = "form-control" })
-                                    @{ Html.ValidateFor(x => x.Hours); }
+                                    @Html.TextBoxFor(x => x.Edit.Hours, new { type = "number", @class = "form-control" })
+                                    @{ Html.ValidateFor(x => x.Edit.Hours); }
                                 </div>
                             </div>
                         </div>
@@ -73,15 +73,15 @@
                     <div class="form-group">
                         @Html.Label("Project", new { @class = "control-label col-md-2" })
                         <div class="col-md-10">
-                            @Html.TextBoxFor(x => x.ProjectName, new { @class = "form-control" })
-                            @{ Html.ValidateFor(x => x.ProjectName); }
+                            @Html.ProjectSelectorFor(x => x.Edit.ProjectID)
+                            @{ Html.ValidateFor(x => x.Edit.ProjectID); }
                         </div>
                     </div>
                     
                     <div class="form-group">
                         @Html.Label("Description", new { @class = "control-label col-md-2" })
                         <div class="col-md-10">
-                            @Html.TextAreaFor(x => x.IssueDescription, new { rows=5, @class = "form-control" })
+                            @Html.TextAreaFor(x => x.Edit.IssueDescription, new { rows = 5, @class = "form-control" })
                         </div>
                     </div>
                 }

@@ -68,7 +68,16 @@ div.search-criteria .form-group.buttons { margin-top:20px; }
 div.search-criteria input[type=date] { z-index:10000; position:relative; }
 div.search-criteria input[type=date].date-range { width:100px; display:inline; }
 div.search-criteria span.date-range-to { margin:0 5px 0 5px; }
-div.search-criteria button[type=submit] { width:49%; }
+div.search-criteria button[type=button] { width:49%; }
+
+/* Search Result*/
+
+.table td.commands { width:60px; white-space:nowrap; }
+.table td.commands a { text-decoration:none; }
+.table td.commands a .glyphicon { font-size:16px !important; }
+.table th.number,
+.table td.number { text-align:right; }
+.table td.date { white-space:nowrap; }
 
 /* jQuery UI */
 

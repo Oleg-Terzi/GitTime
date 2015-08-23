@@ -49,10 +49,10 @@ ORDER BY RowNumber
             string curQuery = string.Format(query, where, rowNumberOrderBy);
 
             ICollection<SqlParameter> parameters = CreateParameters(filter);
-            TimeTrackerContext.AddParameter("@StartRow", SqlDbType.Int, startRow, parameters);
-            TimeTrackerContext.AddParameter("@EndRow", SqlDbType.Int, endRow, parameters);
+            GitTimeContext.AddParameter("@StartRow", SqlDbType.Int, startRow, parameters);
+            GitTimeContext.AddParameter("@EndRow", SqlDbType.Int, endRow, parameters);
 
-            return TimeTrackerContext.GetContext(dbSet).Database.SqlQuery<TimecardFinderRow>(curQuery, parameters.ToArray()).ToList();
+            return GitTimeContext.GetContext(dbSet).Database.SqlQuery<TimecardFinderRow>(curQuery, parameters.ToArray()).ToList();
 
         }
 
@@ -75,8 +75,19 @@ WHERE
 
             ICollection<SqlParameter> parameters = CreateParameters(filter);
 
-            return TimeTrackerContext.GetContext(dbSet).Database.SqlQuery<int>(curQuery, parameters.ToArray()).FirstOrDefault();
+            return GitTimeContext.GetContext(dbSet).Database.SqlQuery<int>(curQuery, parameters.ToArray()).FirstOrDefault();
 
+        }
+
+        #endregion
+
+        #region DELETE
+
+        public static void Delete(this DbSet<Timecard> dbSet, int id)
+        {
+            const string query = "DELETE t.Timecard WHERE pk_ID = @ID";
+
+            GitTimeContext.GetContext(dbSet).Database.ExecuteSqlCommand(query, new SqlParameter("@ID", id));
         }
 
         #endregion
@@ -107,16 +118,16 @@ WHERE
             List<SqlParameter> parameters = new List<SqlParameter>();
 
             if (!string.IsNullOrEmpty(filter.ProjectName))
-                TimeTrackerContext.AddParameterForLike("@ProjectName", filter.ProjectName, parameters);
+                GitTimeContext.AddParameterForLike("@ProjectName", filter.ProjectName, parameters);
 
             if (!string.IsNullOrEmpty(filter.PersonName))
-                TimeTrackerContext.AddParameterForLike("@PersonName", filter.PersonName, parameters);
+                GitTimeContext.AddParameterForLike("@PersonName", filter.PersonName, parameters);
 
             if (filter.EntryDateFrom.HasValue)
-                TimeTrackerContext.AddParameter("@EntryDateFrom", SqlDbType.DateTime, filter.EntryDateFrom.Value.Date, parameters);
+                GitTimeContext.AddParameter("@EntryDateFrom", SqlDbType.DateTime, filter.EntryDateFrom.Value.Date, parameters);
 
             if (filter.EntryDateThru.HasValue)
-                TimeTrackerContext.AddParameter("@EntryDateThru", SqlDbType.DateTime, filter.EntryDateThru.Value.Date.AddDays(1), parameters);
+                GitTimeContext.AddParameter("@EntryDateThru", SqlDbType.DateTime, filter.EntryDateThru.Value.Date.AddDays(1), parameters);
 
             return parameters;
         }

@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Data.Entity;
+using System.IO;
 using System.Linq;
 using System.Net;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Web.Mvc;
 
 using GitTime.Web.Models;
 using GitTime.Web.Models.Database;
-using GitTime.Web.Models.View.Timecard;
+using GitTime.Web.Models.View;
 
 namespace GitTime.Web.Controllers
 {
@@ -16,58 +18,128 @@ namespace GitTime.Web.Controllers
 
         public ActionResult Find()
         {
-            LoadData();
+            TimecardFilter filter = GetInitFilter();
 
-            return View();
-        }
+            FindModel model = new FindModel();
 
-        [HttpPost]
-        public ActionResult Find(FindModel model)
-        {
-            LoadData();
-
-            return View();
-        }
-
-        [HttpPost]
-        public ActionResult Create()
-        {
-            var model = new EditModel() { EntryDate = DateTime.Now };
-
-            using (var db = new TimeTrackerContext())
+            model.SearchResults = new FindModel.SearchResultsModel
             {
-                model.PersonFullName = db.Persons
+                PageIndex = 0,
+                Filter = SerializeFilter(filter)
+            };
+
+            model.SearchCriteria = GetSearchCriteria(filter);
+
+            LoadData(model.SearchResults);
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public ActionResult Search(FindModel model)
+        {
+            TimecardFilter filter;
+
+            if (model.SearchCriteria.Clear)
+            {
+                filter = GetInitFilter();
+            }
+            else
+            {
+                filter = new TimecardFilter
+                {
+                    ProjectName = model.SearchCriteria.ProjectName,
+                    PersonName = model.SearchCriteria.PersonName,
+                    EntryDateFrom = model.SearchCriteria.EntryDateFrom,
+                    EntryDateThru = model.SearchCriteria.EntryDateThru
+                };
+            }
+
+            model.SearchResults.Filter = SerializeFilter(filter);
+
+            model.SearchCriteria = GetSearchCriteria(filter);
+
+            LoadData(model.SearchResults);
+
+            return View("Find", model);
+        }
+
+        [HttpPost]
+        public ActionResult Create(FindModel model)
+        {
+            model.Edit = new FindModel.EditModel() { EntryDate = DateTime.Now };
+
+            using (var db = new GitTimeContext())
+            {
+                model.Edit.PersonContactID = db.Persons
                     .Where(p => p.Email == User.Identity.Name)
-                    .Select(p => new { FullName = p.FirstName + " " + p.LastName }).First().FullName;
+                    .Select(p => p.ID).First();
             }
 
             return PartialView("Edit", model);
         }
 
         [HttpPost]
-        public ActionResult Save(EditModel model)
+        public ActionResult Edit(FindModel model)
         {
-            if (!ModelState.IsValid || !SaveData(model))
+            using (var db = new GitTimeContext())
+            {
+                model.Edit = db.Timecards
+                    .Where(p => p.ID == model.Key.Value)
+                    .Select(p => new FindModel.EditModel
+                    {
+                        ID = p.ID,
+                        EntryDate = p.EntryDate,
+                        PersonContactID = p.PersonContactID,
+                        ProjectID = p.ProjectID,
+                        IssueNumber = p.IssueNumber,
+                        IssueDescription = p.IssueDescription,
+                        Hours = p.Hours
+                    }).First();
+            }
+
+            return PartialView("Edit", model);
+        }
+
+        [HttpPost]
+        public ActionResult Save(FindModel model)
+        {
+            if (!ModelState.IsValid || !SaveData(model.Edit))
             {
                 Response.StatusCode = (int)HttpStatusCode.BadRequest;
 
                 return PartialView("Edit", model);
             }
 
-            LoadData();
+            LoadData(model.SearchResults);
 
-            ViewBag.IsAdded = true;
+            ViewBag.Operation = model.Edit.ID.HasValue ? "Edited" : "Added";
 
-            return PartialView("SearchResults");
+            return PartialView("SearchResults", model);
+        }
+
+        [HttpPost]
+        public ActionResult Delete(FindModel model)
+        {
+            using (GitTimeContext db = new GitTimeContext())
+            {
+                db.Timecards.Delete(model.Key.Value);
+            }
+
+            LoadData(model.SearchResults);
+
+            ViewBag.Operation = "Deleted";
+
+            return PartialView("SearchResults", model);
         }
 
         #endregion
 
         #region Database methods
 
-        private void LoadData()
+        private void LoadData(FindModel.SearchResultsModel model)
         {
-            using (var db = new TimeTrackerContext())
+            using (var db = new GitTimeContext())
             {
                 int count = db.Timecards.Count(new TimecardFilter { });
 
@@ -75,9 +147,9 @@ namespace GitTime.Web.Controllers
             }
         }
 
-        private bool SaveData(EditModel model)
+        private bool SaveData(FindModel.EditModel model)
         {
-            using (var db = new TimeTrackerContext())
+            using (var db = new GitTimeContext())
             {
                 Timecard row = model.ID.HasValue
                     ? db.Timecards.Find(model.ID.Value)
@@ -89,21 +161,11 @@ namespace GitTime.Web.Controllers
                     return false;
                 }
 
-                int? personContactID = FindPerson(model, db);
-
-                if (personContactID == null)
-                    return false;
-
-                int? projectID = FindProject(model, db);
-
-                if (projectID == null)
-                    return false;
-
                 row.EntryDate = model.EntryDate;
-                row.PersonContactID = personContactID.Value;
+                row.PersonContactID = model.PersonContactID.Value;
                 row.IssueNumber = model.IssueNumber;
                 row.Hours = model.Hours.Value;
-                row.ProjectID = projectID.Value;
+                row.ProjectID = model.ProjectID.Value;
                 row.IssueDescription = model.IssueDescription;
 
                 if (model.ID.HasValue)
@@ -117,32 +179,47 @@ namespace GitTime.Web.Controllers
             return true;
         }
 
-        private int? FindPerson(EditModel model, TimeTrackerContext db)
+        private string SerializeFilter(TimecardFilter filter)
         {
-            var persons = db.Persons
-                .Where(p => p.FirstName + " " + p.LastName == model.PersonFullName)
-                .Select(p => p.ID ).ToList();
+            byte[] buffer;
 
-            if (persons.Count == 1)
-                return persons[0];
+            using(MemoryStream stream = new MemoryStream())
+            {
+                new BinaryFormatter().Serialize(stream, filter);
 
-            ModelState.AddModelError("PersonFullName", "Specified person doesn't exist.");
+                buffer = new byte[stream.Length];
 
-            return null;
+                stream.Position = 0;
+                stream.Read(buffer, 0, (int)stream.Length);
+            }
+
+            return Convert.ToBase64String(buffer);
         }
 
-        private int? FindProject(EditModel model, TimeTrackerContext db)
+        private TimecardFilter DeserializeFilter(string filter)
         {
-            var projects = db.Projects
-                .Where(p => p.Name == model.ProjectName)
-                .Select(p => p.ID).ToList();
+            byte[] buffer = Convert.FromBase64String(filter);
 
-            if (projects.Count == 1)
-                return projects[0];
+            using(MemoryStream stream = new MemoryStream(buffer))
+            {
+                return (TimecardFilter)(new BinaryFormatter().Deserialize(stream));
+            }
+        }
 
-            ModelState.AddModelError("ProjectName", "Specified project doesn't exist.");
+        private TimecardFilter GetInitFilter()
+        {
+            return new TimecardFilter();
+        }
 
-            return null;
+        private FindModel.SearchCriteriaModel GetSearchCriteria(TimecardFilter filter)
+        {
+            return new FindModel.SearchCriteriaModel
+            {
+                ProjectName = filter.ProjectName,
+                PersonName = filter.PersonName,
+                EntryDateFrom = filter.EntryDateFrom,
+                EntryDateThru = filter.EntryDateThru
+            };
         }
 
         #endregion
