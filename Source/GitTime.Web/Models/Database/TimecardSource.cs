@@ -63,9 +63,6 @@ SELECT
     CAST(COUNT(*) AS INT)
 FROM
     t.Timecard
-    INNER JOIN c.Contact AS Person ON Person.pk_ID = Timecard.fk_PersonContactID
-    INNER JOIN p.Project ON Project.pk_ID = Timecard.fk_ProjectID
-    INNER JOIN c.Contact AS Company ON Company.pk_ID = Project.fk_CompanyContactID
 WHERE
     {0}
 ";
@@ -98,17 +95,17 @@ WHERE
         {
             StringBuilder where = new StringBuilder("1 = 1");
 
-            if (!string.IsNullOrEmpty(filter.ProjectName))
-                where.Append(" AND Project.Name LIKE @ProjectName");
+            if (filter.ProjectID.HasValue)
+                where.Append(" AND Timecard.fk_ProjectID = @ProjectID");
 
-            if (!string.IsNullOrEmpty(filter.PersonName))
-                where.Append(" AND Person.FirstName LIKE @PersonName");
+            if (filter.PersonContactID.HasValue)
+                where.Append(" AND Timecard.fk_PersonContactID = @PersonContactID");
 
             if (filter.EntryDateFrom.HasValue)
-                where.Append(" AND Timecard.EntryDateFrom >= @EntryDateFrom");
+                where.Append(" AND Timecard.EntryDate >= @EntryDateFrom");
 
             if (filter.EntryDateThru.HasValue)
-                where.Append(" AND Timecard.EntryDateThru < @EntryDateThru");
+                where.Append(" AND Timecard.EntryDate < @EntryDateThru");
 
             return where.ToString();
         }
@@ -117,11 +114,11 @@ WHERE
         {
             List<SqlParameter> parameters = new List<SqlParameter>();
 
-            if (!string.IsNullOrEmpty(filter.ProjectName))
-                GitTimeContext.AddParameterForLike("@ProjectName", filter.ProjectName, parameters);
+            if (filter.ProjectID.HasValue)
+                GitTimeContext.AddParameter("@ProjectID", SqlDbType.Int, filter.ProjectID, parameters);
 
-            if (!string.IsNullOrEmpty(filter.PersonName))
-                GitTimeContext.AddParameterForLike("@PersonName", filter.PersonName, parameters);
+            if (filter.PersonContactID.HasValue)
+                GitTimeContext.AddParameter("@PersonContactID", SqlDbType.Int, filter.PersonContactID, parameters);
 
             if (filter.EntryDateFrom.HasValue)
                 GitTimeContext.AddParameter("@EntryDateFrom", SqlDbType.DateTime, filter.EntryDateFrom.Value.Date, parameters);

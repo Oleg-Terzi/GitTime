@@ -17,9 +17,9 @@ namespace GitTime.Web.Models.View
         {
             public string Action { get; set; }
 
-            public string ProjectName { get; set; }
+            public int? ProjectID { get; set; }
 
-            public string PersonName { get; set; }
+            public int? PersonContactID { get; set; }
 
             public DateTime? EntryDateFrom { get; set; }
 

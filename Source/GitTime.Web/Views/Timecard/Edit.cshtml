@@ -46,7 +46,7 @@
                             <div class="form-group">
                                 @Html.Label("Person", new { @class = "control-label col-md-4" })
                                 <div class="col-md-8">
-                                    @Html.PersonSelectorFor(x => x.Edit.PersonContactID)
+                                    @Html.PersonSelectorFor(x => x.Edit.PersonContactID, new { @class = "form-control" })
                                     @{ Html.ValidateFor(x => x.Edit.PersonContactID); }
                                 </div>
                             </div>
@@ -73,7 +73,7 @@
                     <div class="form-group">
                         @Html.Label("Project", new { @class = "control-label col-md-2" })
                         <div class="col-md-10">
-                            @Html.ProjectSelectorFor(x => x.Edit.ProjectID)
+                            @Html.ProjectSelectorFor(x => x.Edit.ProjectID, new { @class = "form-control" })
                             @{ Html.ValidateFor(x => x.Edit.ProjectID); }
                         </div>
                     </div>

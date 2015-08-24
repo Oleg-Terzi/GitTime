@@ -48,8 +48,8 @@ namespace GitTime.Web.Controllers
             {
                 filter = new TimecardFilter
                 {
-                    ProjectName = model.SearchCriteria.ProjectName,
-                    PersonName = model.SearchCriteria.PersonName,
+                    ProjectID = model.SearchCriteria.ProjectID,
+                    PersonContactID = model.SearchCriteria.PersonContactID,
                     EntryDateFrom = model.SearchCriteria.EntryDateFrom,
                     EntryDateThru = model.SearchCriteria.EntryDateThru
                 };
@@ -60,6 +60,8 @@ namespace GitTime.Web.Controllers
             model.SearchCriteria = GetSearchCriteria(filter);
 
             LoadData(model.SearchResults);
+
+            ModelState.Clear();//Allows to re-bind strongly typed controls from model rather than from model state
 
             return View("Find", model);
         }
@@ -139,11 +141,13 @@ namespace GitTime.Web.Controllers
 
         private void LoadData(FindModel.SearchResultsModel model)
         {
+            TimecardFilter filter = DeserializeFilter(model.Filter);
+
             using (var db = new GitTimeContext())
             {
-                int count = db.Timecards.Count(new TimecardFilter { });
+                int count = db.Timecards.Count(filter);
 
-                ViewBag.DataSource = db.Timecards.SelectFinderRows(1, 100, new TimecardFilter { }, null);
+                ViewBag.DataSource = db.Timecards.SelectFinderRows(1, 100, filter, null);
             }
         }
 
@@ -196,9 +200,9 @@ namespace GitTime.Web.Controllers
             return Convert.ToBase64String(buffer);
         }
 
-        private TimecardFilter DeserializeFilter(string filter)
+        private TimecardFilter DeserializeFilter(string serializedFilter)
         {
-            byte[] buffer = Convert.FromBase64String(filter);
+            byte[] buffer = Convert.FromBase64String(serializedFilter);
 
             using(MemoryStream stream = new MemoryStream(buffer))
             {
@@ -215,8 +219,8 @@ namespace GitTime.Web.Controllers
         {
             return new FindModel.SearchCriteriaModel
             {
-                ProjectName = filter.ProjectName,
-                PersonName = filter.PersonName,
+                ProjectID = filter.ProjectID,
+                PersonContactID = filter.PersonContactID,
                 EntryDateFrom = filter.EntryDateFrom,
                 EntryDateThru = filter.EntryDateThru
             };

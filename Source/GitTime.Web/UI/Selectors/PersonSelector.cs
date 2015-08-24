@@ -10,9 +10,7 @@ namespace GitTime.Web.UI.Selectors
 {
     public static class PersonSelector
     {
-        #region Extensions
-
-        public static MvcHtmlString PersonSelectorFor<TModel, TProperty>(this HtmlHelper<TModel> htmlHelper, Expression<Func<TModel, TProperty>> expression)
+        public static MvcHtmlString PersonSelectorFor<TModel, TProperty>(this HtmlHelper<TModel> htmlHelper, Expression<Func<TModel, TProperty>> expression, object htmlAttributes = null, bool validate = true)
         {
             IEnumerable<DataItem> dataSource;
 
@@ -23,9 +21,7 @@ namespace GitTime.Web.UI.Selectors
                     .Select(c => new DataItem { Text = c.FirstName + " " + c.LastName, Value = c.ID.ToString() }).ToList();
             }
 
-            return BaseSelector.GetSelector(htmlHelper, expression, true, dataSource);
+            return BaseSelector.GetSelector(htmlHelper, expression, htmlAttributes, validate, true, "Select a Person...", dataSource);
         }
-
-        #endregion
     }
 }
