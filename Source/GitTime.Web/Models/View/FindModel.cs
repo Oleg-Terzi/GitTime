@@ -10,7 +10,7 @@ namespace GitTime.Web.Models.View
         public class SearchResultsModel
         {
             public string Filter { get; set; }
-            public int? PageIndex { get; set; }
+            public int PageIndex { get; set; }
         }
 
         public class SearchCriteriaModel

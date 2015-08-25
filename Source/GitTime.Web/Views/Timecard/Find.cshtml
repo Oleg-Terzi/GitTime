@@ -46,6 +46,27 @@
             });
         },
 
+        changePage: function (pageIndex) {
+            if ($("#SearchResults_PageIndex").val() == pageIndex)
+                return;
+
+            $("#SearchResults_PageIndex").val(pageIndex);
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("ChangePage", "Timecard")',
+                data: _editor._getJsonData(null),
+                success: function (data) {
+                    $('#SearchResultsPlaceholder').html(data);
+                },
+                error: function (xhr) {
+                    var newDoc = document.open("text/html", "replace");
+                    newDoc.write(xhr.responseText);
+                    newDoc.close();
+                },
+            });
+        },
+
         showEditor: function (key) {
             $.ajax({
                 type: "POST",

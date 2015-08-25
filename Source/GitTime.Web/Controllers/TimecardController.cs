@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.IO;
 using System.Linq;
@@ -56,6 +57,7 @@ namespace GitTime.Web.Controllers
             }
 
             model.SearchResults.Filter = SerializeFilter(filter);
+            model.SearchResults.PageIndex = 0;
 
             model.SearchCriteria = GetSearchCriteria(filter);
 
@@ -64,6 +66,14 @@ namespace GitTime.Web.Controllers
             ModelState.Clear();//Allows to re-bind strongly typed controls from model rather than from model state
 
             return View("Find", model);
+        }
+
+        [HttpPost]
+        public ActionResult ChangePage(FindModel model)
+        {
+            LoadData(model.SearchResults);
+
+            return PartialView("SearchResults", model);
         }
 
         [HttpPost]
@@ -143,12 +153,30 @@ namespace GitTime.Web.Controllers
         {
             TimecardFilter filter = DeserializeFilter(model.Filter);
 
+            int pageCount;
+            ICollection<TimecardFinderRow> dataSource;
+
             using (var db = new GitTimeContext())
             {
                 int count = db.Timecards.Count(filter);
 
-                ViewBag.DataSource = db.Timecards.SelectFinderRows(1, 100, filter, null);
+                pageCount = count / Constants.PageSize;
+
+                if (count % Constants.PageSize != 0)
+                    pageCount++;
+
+                if (model.PageIndex < 0 || model.PageIndex >= pageCount)
+                    model.PageIndex = 0;
+
+                int startRow = model.PageIndex * Constants.PageSize;
+                int endRow = startRow + Constants.PageSize - 1;
+
+                dataSource = db.Timecards.SelectFinderRows(startRow, endRow, filter, null);
             }
+
+            ViewBag.DataSource = dataSource;
+            ViewBag.PageCount = pageCount;
+            ViewBag.VisiblePageCount = Constants.VisiblePageCount;
         }
 
         private bool SaveData(FindModel.EditModel model)
