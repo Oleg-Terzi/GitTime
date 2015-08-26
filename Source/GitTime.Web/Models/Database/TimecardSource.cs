@@ -73,7 +73,25 @@ WHERE
             ICollection<SqlParameter> parameters = CreateParameters(filter);
 
             return GitTimeContext.GetContext(dbSet).Database.SqlQuery<int>(curQuery, parameters.ToArray()).FirstOrDefault();
+        }
 
+        public static decimal SumHours(this DbSet<Timecard> dbSet, TimecardFilter filter)
+        {
+            const string query = @"
+SELECT
+    SUM(Hours)
+FROM
+    t.Timecard
+WHERE
+    {0}
+";
+
+            string where = CreateWhere(filter);
+            string curQuery = string.Format(query, where);
+
+            ICollection<SqlParameter> parameters = CreateParameters(filter);
+
+            return GitTimeContext.GetContext(dbSet).Database.SqlQuery<decimal>(curQuery, parameters.ToArray()).FirstOrDefault();
         }
 
         #endregion

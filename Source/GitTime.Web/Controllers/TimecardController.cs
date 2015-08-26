@@ -153,28 +153,37 @@ namespace GitTime.Web.Controllers
         {
             TimecardFilter filter = DeserializeFilter(model.Filter);
 
-            int pageCount;
+            decimal sumHours;
+            int startRow, endRow, rowCount, pageCount;
             ICollection<TimecardFinderRow> dataSource;
 
             using (var db = new GitTimeContext())
             {
-                int count = db.Timecards.Count(filter);
+                sumHours = db.Timecards.SumHours(filter);
+                rowCount = db.Timecards.Count(filter);
 
-                pageCount = count / Constants.PageSize;
+                pageCount = rowCount / Constants.PageSize;
 
-                if (count % Constants.PageSize != 0)
+                if (rowCount % Constants.PageSize != 0)
                     pageCount++;
 
                 if (model.PageIndex < 0 || model.PageIndex >= pageCount)
                     model.PageIndex = 0;
 
-                int startRow = model.PageIndex * Constants.PageSize;
-                int endRow = startRow + Constants.PageSize - 1;
+                startRow = model.PageIndex * Constants.PageSize + 1;
+                endRow = startRow + Constants.PageSize - 1;
+
+                if (endRow > rowCount)
+                    endRow = rowCount;
 
                 dataSource = db.Timecards.SelectFinderRows(startRow, endRow, filter, null);
             }
 
             ViewBag.DataSource = dataSource;
+            ViewBag.SumHours = sumHours;
+            ViewBag.StartRow = startRow;
+            ViewBag.EndRow = endRow;
+            ViewBag.RowCount = rowCount;
             ViewBag.PageCount = pageCount;
             ViewBag.VisiblePageCount = Constants.VisiblePageCount;
         }

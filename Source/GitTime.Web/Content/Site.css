@@ -78,6 +78,9 @@ div.search-criteria button[type=button] { width:49%; }
 .table th.number,
 .table td.number { text-align:right; }
 .table td.date { white-space:nowrap; }
+.table td.summary { font-weight:bold; }
+
+.page-number { text-align:right; margin-top:20px; margin-bottom:20px; }
 
 /* jQuery UI */
 

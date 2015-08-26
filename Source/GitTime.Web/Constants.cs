@@ -2,7 +2,7 @@
 {
     public class Constants
     {
-        public const int PageSize = 10;
-        public const int VisiblePageCount = 2;
+        public const int PageSize = 20;
+        public const int VisiblePageCount = 10;
     }
 }
