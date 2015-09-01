@@ -91,7 +91,7 @@ WHERE
 
             ICollection<SqlParameter> parameters = CreateParameters(filter);
 
-            return GitTimeContext.GetContext(dbSet).Database.SqlQuery<decimal>(curQuery, parameters.ToArray()).FirstOrDefault();
+            return GitTimeContext.GetContext(dbSet).Database.SqlQuery<decimal?>(curQuery, parameters.ToArray()).FirstOrDefault() ?? 0;
         }
 
         #endregion

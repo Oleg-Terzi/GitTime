@@ -20,7 +20,7 @@ DECLARE @Person_Aleksey INT, @Person_Daniel INT, @Person_Oleg INT
 
 INSERT c.Contact (Email, FirstName, LastName, Password, Subtype) VALUES ('aleksey', 'Aleksey', 'Terzi', 'aleksey', 'Person'); SELECT @Person_Aleksey = SCOPE_IDENTITY()
 INSERT c.Contact (Email, FirstName, LastName, Password, Subtype) VALUES ('daniel', 'Daniel', 'Miller', 'daniel', 'Person'); SELECT @Person_Daniel = SCOPE_IDENTITY()
-INSERT c.Contact (Email, FirstName, LastName, Password, Subtype) VALUES ('oleg', 'Oleg', 'Terz', 'oleg', 'Person'); SELECT @Person_Oleg = SCOPE_IDENTITY()
+INSERT c.Contact (Email, FirstName, LastName, Password, Subtype) VALUES ('oleg', 'Oleg', 'Terzi', 'oleg', 'Person'); SELECT @Person_Oleg = SCOPE_IDENTITY()
 
 DECLARE @Project_Lemar INT, @Project_Iris INT, @Project_Ncsha INT, @Project_Cape INT, @Project_Cmds INT, @Project_SCC INT, @Project_Roska INT
 

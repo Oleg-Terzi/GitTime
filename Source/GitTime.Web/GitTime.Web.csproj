@@ -121,6 +121,7 @@
     <Compile Include="Binders\DecimalModelBinder.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Controllers\BaseController.cs" />
+    <Compile Include="Controllers\BaseFindController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\LoginController.cs" />
     <Compile Include="Controllers\TimecardController.cs" />
@@ -138,7 +139,10 @@
     <Compile Include="Models\GitTimeDbInitializer.cs" />
     <Compile Include="Models\GitTimeContext.cs" />
     <Compile Include="Models\View\LoginModel.cs" />
-    <Compile Include="Models\View\FindModel.cs" />
+    <Compile Include="Models\View\Timecard\EditModel.cs" />
+    <Compile Include="Models\View\Timecard\FindModel.cs" />
+    <Compile Include="Models\View\Timecard\SearchCriteriaModel.cs" />
+    <Compile Include="Models\View\BaseSearchResultsModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UI\Inputs\InputDateWithoutValidation.cs" />
     <Compile Include="UI\Selectors\BaseSelector.cs" />
@@ -232,6 +236,7 @@
     <Content Include="Views\Timecard\Find.cshtml" />
     <Content Include="Views\Timecard\Edit.cshtml" />
     <Content Include="Views\Timecard\SearchResults.cshtml" />
+    <Content Include="Views\Shared\_Find.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
