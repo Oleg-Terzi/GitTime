@@ -1,0 +1,28 @@
+﻿@{
+    var _operation = (string)ViewBag.Operation;
+    var _singleEntityName = (string)ViewBag.SingleEntityName;
+    var _pageIndex = (int?)ViewBag.PageIndex ?? 0;
+    var _serializedFilter = (string)ViewBag.SerializedFilter;
+}
+
+@Html.Hidden("SearchResults_PageIndex", _pageIndex)
+@Html.Hidden("SearchResults_SerializedFilter", _serializedFilter)
+
+@if (!string.IsNullOrEmpty(_operation))
+{
+    <div class="alert alert-success alert-dismissible" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        @switch (_operation)
+        {
+            case "Added":
+                @("New " + _singleEntityName + " successfully created.")
+                break;
+            case "Edited":
+            @(_singleEntityName + " successfully updated.")
+                break;
+            case "Deleted":
+            @(_singleEntityName + " successfully deleted.")
+                break;
+        }
+    </div>
+}

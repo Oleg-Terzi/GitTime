@@ -5,9 +5,9 @@ using System.Web.Routing;
 
 namespace GitTime.Web.UI.Inputs
 {
-    public static class InputDateWithoutValidation
+    public static class InputTextWithoutValidation
     {
-        public static MvcHtmlString InputDateWithoutValidationFor<TModel, TProperty>(this HtmlHelper<TModel> htmlHelper, Expression<Func<TModel, TProperty>> expression, object htmlAttributes = null)
+        public static MvcHtmlString InputTextWithoutValidationFor<TModel, TProperty>(this HtmlHelper<TModel> htmlHelper, Expression<Func<TModel, TProperty>> expression, object htmlAttributes = null)
         {
             string name = htmlHelper.ViewContext.ViewData.TemplateInfo.GetFullHtmlFieldName(ExpressionHelper.GetExpressionText(expression));
             string id = htmlHelper.ViewContext.ViewData.TemplateInfo.GetFullHtmlFieldId(ExpressionHelper.GetExpressionText(expression));
@@ -21,17 +21,13 @@ namespace GitTime.Web.UI.Inputs
                 input.Attributes.Add("id", id);
 
             input.Attributes["name"] = name;
-            input.Attributes["type"] = "date";
+            input.Attributes["type"] = "text";
 
             foreach (var routeValue in routeValueDictionary)
                 input.MergeAttribute(routeValue.Key, routeValue.Value.ToString(), true);
 
             if (metadata.Model != null)
-            {
-                string value = string.Format(@"{0:MM\/dd\/yyyy}", metadata.Model);
-
-                input.Attributes.Add("value", value);
-            }
+                input.Attributes.Add("value", metadata.Model.ToString());
 
             return new MvcHtmlString(input.ToString(TagRenderMode.SelfClosing));
         }

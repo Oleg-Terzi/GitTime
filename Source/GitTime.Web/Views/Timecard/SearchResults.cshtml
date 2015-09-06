@@ -1,52 +1,22 @@
 ﻿@using GitTime.Web.Models.Database
 @using GitTime.Web.Models.View.Timecard
 
-@model FindModel
+@model FinderModel
 
 @{
-    var _operation = (string)ViewBag.Operation;
-
     var _dataSource = (ICollection<TimecardFinderRow>)ViewBag.DataSource;
     var _sumHours = (decimal?)ViewBag.SumHours ?? 0;
-
-    var _startRow = (int?)ViewBag.StartRow ?? 0;
-    var _endRow = (int?)ViewBag.EndRow ?? 0;
-    var _rowCount = (int?)ViewBag.RowCount ?? 0;
-        
-    var _pageCount = (int?)ViewBag.PageCount ?? 0;
-    var _visiblePageCount = (int?)ViewBag.VisiblePageCount ?? 0;
-    var _startPage = _visiblePageCount * (Model.SearchResults.PageIndex / _visiblePageCount);
 }
 
-@if (!string.IsNullOrEmpty(_operation))
-{
-    <div class="alert alert-success alert-dismissible" role="alert">
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        @switch (_operation)
-        {
-            case "Added":
-                @("New timecard successfully created.")
-                break;
-            case "Edited":
-            @("Timecard successfully updated.")
-                break;
-            case "Deleted":
-            @("Timecard successfully deleted.")
-                break;
-        }
-    </div>
-}
+@Html.Partial("_SearchResultsHeader")
 
 <p>
-    <button id="NewTimecardButton" type="button" class="btn btn-primary" data-toggle="modal" data-target="#Editor" onclick="_finder.showCreator();">
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#Editor" onclick="_finder.showCreator();">
         New Timecard
     </button>
 
     <div id="EditorPlaceholder"></div>
 </p>
-
-@Html.HiddenFor(x => x.SearchResults.PageIndex)
-@Html.HiddenFor(x => x.SearchResults.SerializedFilter)
 
 @if (_dataSource.Count > 0)
 {
@@ -88,70 +58,8 @@
             </tr>
         </tbody>
     </table>
-
-    <div class="row">
-        <div class="col-md-6">
-
-            @if (_pageCount > 1)
-            {
-                <nav>
-                    <ul class="pagination">
-                        @if (Model.SearchResults.PageIndex == 0)
-                        {
-                            <li class="disabled">
-                                <a href="#" aria-label="Previous" title="Previous" onclick="return false;">
-                                    <span aria-hidden="true">&laquo;</span>
-                                </a>
-                            </li>
-                        }
-                        else
-                        {
-                            <li>
-                                <a href="#" aria-label="Previous" title="Previous" onclick="_finder.changePage(@(Model.SearchResults.PageIndex - 1)); return false;">
-                                    <span aria-hidden="true">&laquo;</span>
-                                </a>
-                            </li>
-                        }
-
-                        @if (_startPage > 0)
-                        {
-                            <li><a href="#" title="Previous Pages" onclick="_finder.changePage(@(_startPage - 1)); return false;">...</a></li>
-                        }
-
-                        @for (int i = _startPage; i < _pageCount && i < _startPage + _visiblePageCount; i++)
-                        {
-                            <li class="@(i == Model.SearchResults.PageIndex ? "active" : "")"><a href="#" onclick="_finder.changePage(@i); return false;">@(i + 1)</a></li>
-                        }
-
-                        @if (_startPage + _visiblePageCount < _pageCount)
-                        {
-                            <li><a href="#" title="Next Pages" onclick="_finder.changePage(@(_startPage + _visiblePageCount)); return false;">...</a></li>
-                        }
-
-                        @if (Model.SearchResults.PageIndex == _pageCount - 1)
-                        {
-                            <li class="disabled">
-                                <a href="#" aria-label="Next" title="Next" onclick="return false;">
-                                    <span aria-hidden="true">&raquo;</span>
-                                </a>
-                            </li>
-                        }
-                        else
-                        {
-                            <li>
-                                <a href="#" aria-label="Next" title="Next" onclick="_finder.changePage(@(Model.SearchResults.PageIndex + 1)); return false;">
-                                    <span aria-hidden="true">&raquo;</span>
-                                </a>
-                            </li>
-                        }
-                    </ul>
-                </nav>
-            }
-        </div>
-        <div class="col-md-6 page-number">
-            Timecards @_startRow - @_endRow of @_rowCount
-        </div>
-    </div>
+    
+    @Html.Partial("_SearchResultsPager")
 }
 else
 {

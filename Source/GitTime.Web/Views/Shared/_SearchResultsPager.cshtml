@@ -1,0 +1,10 @@
+﻿@{
+    var _multiEntityName = (string)ViewBag.MultiEntityName;
+    var _startRow = (int?)ViewBag.StartRow ?? 0;
+    var _endRow = (int?)ViewBag.EndRow ?? 0;
+    var _rowCount = (int?)ViewBag.RowCount ?? 0;
+    var _pageIndex = (int?)ViewBag.PageIndex ?? 0;
+    var _pageCount = (int?)ViewBag.PageCount ?? 0;
+}
+
+@Html.Pager(_multiEntityName, _startRow, _endRow, _rowCount, _pageIndex, _pageCount)

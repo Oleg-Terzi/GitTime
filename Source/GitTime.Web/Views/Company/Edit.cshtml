@@ -1,0 +1,57 @@
+﻿@using GitTime.Web.Models.View.Company
+
+@model FinderModel
+
+@{
+    var _errorMessage = (string)ViewBag.ErrorMessage;
+}
+
+<!-- Modal -->
+<div class="modal fade" id="Editor" tabindex="-1" role="dialog" aria-labelledby="EditorTitle" data-backdrop="false" data-keyboard="false">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="EditorTitle">
+                    @(Model.Edit.ID.HasValue ? "Edit Company" : "New Company")
+                </h4>
+            </div>
+            <div class="modal-body">
+
+                @using (Html.BeginForm("Edit", null, null, FormMethod.Post, new { role = "form", @class = "form-horizontal" }))
+                {
+                    <div class="alert alert-danger" role="alert" style="display:none;">
+                        @if (_errorMessage != null)
+                        {
+                            @(_errorMessage)
+                        }
+                        else
+                        {
+                            @("Make sure all fields have valid values.")
+                        }
+                    </div>
+
+                    @Html.HiddenFor(x => x.Edit.ID)
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                @Html.Label("Name", new { @class = "control-label col-md-2" })
+                                <div class="col-md-10">
+                                    @Html.TextBoxFor(x => x.Edit.Name, new { @class = "form-control" })
+                                    @{ Html.ValidateFor(x => x.Edit.Name); }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="_finder.save();">Save</button>
+            </div>
+        </div>
+    </div>
+</div>

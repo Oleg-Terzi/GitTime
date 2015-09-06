@@ -1,0 +1,45 @@
+﻿@using GitTime.Web.Models.View.Person
+
+@model FinderModel
+
+@{
+    ViewBag.Title = "Persons";
+}
+
+@section Scripts
+{
+    @Html.Partial("_Find")
+}
+
+@section SearchCriteria
+{
+    <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Search <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+            <li>
+                <div id="SearchCriteria" class="search-criteria">
+                    @using (Html.BeginForm(null, null, null, FormMethod.Post, new { role = "form" }))
+                    {
+                        <div class="form-group">
+                            @Html.InputTextWithoutValidationFor(x => x.SearchCriteria.PersonName, new { placeholder = "Person Name", @class = "form-control input-sm" })
+                        </div>
+
+                        <div class="form-group buttons">
+                            <button name="action" value="search" type="button" class="btn btn-primary btn-sm" onclick="_finder.search(false);">Search</button>
+                            <button name="action" value="clear" type="button" class="btn btn-default btn-sm" onclick="_finder.search(true);">Clear</button>
+                        </div>
+                    }
+                </div>
+            </li>
+        </ul>
+    </li>
+}
+
+<h1 class="page-header">Persons</h1>
+
+<div id="SearchResultsPlaceholder">
+    @Html.Partial("SearchResults")
+</div>
+
+<div class="loading-modal">
+</div>

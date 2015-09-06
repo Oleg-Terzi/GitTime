@@ -58,14 +58,7 @@ ORDER BY RowNumber
 
         public static int Count(this DbSet<Timecard> dbSet, TimecardFilter filter)
         {
-            const string query = @"
-SELECT
-    CAST(COUNT(*) AS INT)
-FROM
-    t.Timecard
-WHERE
-    {0}
-";
+            const string query = @"SELECT CAST(COUNT(*) AS INT) FROM t.Timecard WHERE {0}";
 
             string where = CreateWhere(filter);
             string curQuery = string.Format(query, where);
@@ -77,14 +70,7 @@ WHERE
 
         public static decimal SumHours(this DbSet<Timecard> dbSet, TimecardFilter filter)
         {
-            const string query = @"
-SELECT
-    SUM(Hours)
-FROM
-    t.Timecard
-WHERE
-    {0}
-";
+            const string query = @"SELECT SUM(Hours) FROM t.Timecard WHERE {0}";
 
             string where = CreateWhere(filter);
             string curQuery = string.Format(query, where);

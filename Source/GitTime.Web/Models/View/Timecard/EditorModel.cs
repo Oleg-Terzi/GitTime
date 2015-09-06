@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace GitTime.Web.Models.View.Timecard
 {
-    public class EditModel
+    public class EditorModel
     {
         public int? ID { get; set; }
 

@@ -9,8 +9,22 @@ using GitTime.Web.Models.View.Timecard;
 
 namespace GitTime.Web.Controllers
 {
-    public class TimecardController : BaseFindController<FindModel, TimecardFilter>
+    public class TimecardController : BaseFinderController<FinderModel, TimecardFilter>
     {
+        #region Properties
+
+        protected override string SingleEntityName
+        {
+            get { return "Timecard"; }
+        }
+
+        protected override string MultiEntityName
+        {
+            get { return "Timecards"; }
+        }
+
+        #endregion
+
         #region Initialization
         
         protected override TimecardFilter GetInitFilter()
@@ -18,23 +32,25 @@ namespace GitTime.Web.Controllers
             return new TimecardFilter();
         }
 
-        protected override TimecardFilter GetFilterBySearchCriteria(FindModel model)
+        protected override TimecardFilter GetFilterBySearchCriteria(FinderModel model)
         {
-            return new TimecardFilter
-            {
-                ProjectID = model.SearchCriteria.ProjectID,
-                PersonContactID = model.SearchCriteria.PersonContactID,
-                EntryDateFrom = model.SearchCriteria.EntryDateFrom,
-                EntryDateThru = model.SearchCriteria.EntryDateThru
-            };
+            return model.SearchCriteria.Clear
+                ? GetInitFilter()
+                : new TimecardFilter
+                    {
+                        ProjectID = model.SearchCriteria.ProjectID,
+                        PersonContactID = model.SearchCriteria.PersonContactID,
+                        EntryDateFrom = model.SearchCriteria.EntryDateFrom,
+                        EntryDateThru = model.SearchCriteria.EntryDateThru
+                    };
         }
 
-        protected override BaseSearchResultsModel GetSearchResults(FindModel model)
+        protected override BaseSearchResultsModel GetSearchResults(FinderModel model)
         {
             return model.SearchResults;
         }
 
-        protected override void InitModel(FindModel model, BaseSearchResultsModel searchResults, TimecardFilter filter)
+        protected override void InitModel(FinderModel model, BaseSearchResultsModel searchResults, TimecardFilter filter)
         {
             model.SearchResults = searchResults;
 
@@ -47,9 +63,9 @@ namespace GitTime.Web.Controllers
             };
         }
 
-        protected override void InitCreate(FindModel model)
+        protected override void InitCreate(FinderModel model)
         {
-            model.Edit = new EditModel() { EntryDate = DateTime.Now };
+            model.Edit = new EditorModel() { EntryDate = DateTime.Now };
 
             using (var db = new GitTimeContext())
             {
@@ -59,13 +75,13 @@ namespace GitTime.Web.Controllers
             }
         }
 
-        protected override void InitEdit(FindModel model)
+        protected override void InitEdit(FinderModel model)
         {
             using (var db = new GitTimeContext())
             {
                 model.Edit = db.Timecards
                     .Where(p => p.ID == model.Key.Value)
-                    .Select(p => new EditModel
+                    .Select(p => new EditorModel
                     {
                         ID = p.ID,
                         EntryDate = p.EntryDate,
@@ -99,14 +115,14 @@ namespace GitTime.Web.Controllers
                 return db.Timecards.SelectFinderRows(startRow, endRow, filter, null);
         }
 
-        protected override SaveResult SaveData(FindModel model)
+        protected override SaveResult SaveData(FinderModel model)
         {
-            EditModel editModel = model.Edit;
+            EditorModel editorModel = model.Edit;
 
             using (var db = new GitTimeContext())
             {
-                Timecard row = editModel.ID.HasValue
-                    ? db.Timecards.Find(editModel.ID.Value)
+                Timecard row = editorModel.ID.HasValue
+                    ? db.Timecards.Find(editorModel.ID.Value)
                     : new Timecard();
 
                 if (row == null)
@@ -115,14 +131,14 @@ namespace GitTime.Web.Controllers
                     return SaveResult.NotSaved;
                 }
 
-                row.EntryDate = editModel.EntryDate;
-                row.PersonContactID = editModel.PersonContactID.Value;
-                row.IssueNumber = editModel.IssueNumber;
-                row.Hours = editModel.Hours.Value;
-                row.ProjectID = editModel.ProjectID.Value;
-                row.IssueDescription = editModel.IssueDescription;
+                row.EntryDate = editorModel.EntryDate;
+                row.PersonContactID = editorModel.PersonContactID.Value;
+                row.IssueNumber = editorModel.IssueNumber;
+                row.Hours = editorModel.Hours.Value;
+                row.ProjectID = editorModel.ProjectID.Value;
+                row.IssueDescription = editorModel.IssueDescription;
 
-                if (editModel.ID.HasValue)
+                if (editorModel.ID.HasValue)
                     db.Entry(row).State = EntityState.Modified;
                 else
                     db.Timecards.Add(row);
@@ -130,10 +146,10 @@ namespace GitTime.Web.Controllers
                 db.SaveChanges();
             }
 
-            return editModel.ID.HasValue ? SaveResult.Edited: SaveResult.Edited;
+            return editorModel.ID.HasValue ? SaveResult.Edited: SaveResult.Added;
         }
 
-        protected override void DeleteData(FindModel model)
+        protected override void DeleteData(FinderModel model)
         {
             using (GitTimeContext db = new GitTimeContext())
             {

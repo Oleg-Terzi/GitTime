@@ -26,8 +26,8 @@ namespace GitTime.Web.Models
 
             modelBuilder.Entity<Contact>()
                 .Map<Contact>(m => m.Requires("Subtype").HasValue("Contact"))
-                .Map<Company>(m => m.Requires("Subtype").HasValue("Company"))
-                .Map<Person>(m => m.Requires("Subtype").HasValue("Person"))
+                .Map<Company>(m => m.Requires("Subtype").HasValue(Constants.ContactTypes.Company))
+                .Map<Person>(m => m.Requires("Subtype").HasValue(Constants.ContactTypes.Person))
                 ;
 
             base.OnModelCreating(modelBuilder);

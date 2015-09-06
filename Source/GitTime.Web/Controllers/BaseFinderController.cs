@@ -8,12 +8,19 @@ using GitTime.Web.Models.View;
 
 namespace GitTime.Web.Controllers
 {
-    public abstract class BaseFindController<ModelType, FilterType>: BaseController
+    public abstract class BaseFinderController<ModelType, FilterType>: BaseController
         where ModelType: new()
     {
         #region Enums
 
         protected enum SaveResult { NotSaved, Added, Edited }
+
+        #endregion
+
+        #region Properties
+
+        protected abstract string SingleEntityName { get; }
+        protected abstract string MultiEntityName { get; }
 
         #endregion
 
@@ -164,11 +171,14 @@ namespace GitTime.Web.Controllers
                 endRow = rowCount;
 
             ViewBag.DataSource = Select(startRow, endRow, filter);
+            ViewBag.SingleEntityName = SingleEntityName;
+            ViewBag.MultiEntityName = MultiEntityName;
+            ViewBag.SerializedFilter = searchResults.SerializedFilter;
             ViewBag.StartRow = startRow;
             ViewBag.EndRow = endRow;
             ViewBag.RowCount = rowCount;
+            ViewBag.PageIndex = searchResults.PageIndex;
             ViewBag.PageCount = pageCount;
-            ViewBag.VisiblePageCount = Constants.VisiblePageCount;
         }
 
         #endregion

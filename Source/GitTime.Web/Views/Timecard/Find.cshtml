@@ -1,6 +1,6 @@
 ﻿@using GitTime.Web.Models.View.Timecard
 
-@model FindModel
+@model FinderModel
 
 @{
     ViewBag.Title = "Timecards";
@@ -34,7 +34,7 @@
 
                         <div class="form-group buttons">
                             <button name="action" value="search" type="button" class="btn btn-primary btn-sm" onclick="_finder.search(false);">Search</button>
-                            <button name="action" value="clear" type="button" class="btn btn-default btn-sm" onclick="_finder.search(true); $(this).dropdown('toggle');">Clear</button>
+                            <button name="action" value="clear" type="button" class="btn btn-default btn-sm" onclick="_finder.search(true);">Clear</button>
                         </div>
                     }
                 </div>
