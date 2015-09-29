@@ -1,5 +1,7 @@
 ﻿@model GitTime.Web.Models.View.LoginModel
 
+@using GitTime.Web.Infrastructure.GitHub
+
 @{
     ViewBag.Title = "Login";
 
@@ -34,8 +36,12 @@
 
             <a href="@Url.Action("ForgotPassword", "Login")"><small>Forgot your password?</small></a>
             <p class="text-muted text-center"><small>Do not have an account?</small></p>
+            <p><a class="btn btn-default btn-sm" href="@Url.Action("Register", "Login")">Register a new account</a></p>
             
-            <a class="btn btn-default btn-sm" href="@Url.Action("Register", "Login")">Register a new account</a>
+            if (GitHubHelper.IsConfigured)
+            {
+                <p><a class="btn btn-default btn-sm" href="@Url.Action("GitHubLogin")">Sign in with GitHub</a></p>
+            }
         }
     </div>
 </div>

@@ -123,6 +123,7 @@
     <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\BaseFinderController.cs" />
     <Compile Include="Controllers\CompanyController.cs" />
+    <Compile Include="Controllers\GitHubController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\LoginController.cs" />
     <Compile Include="Controllers\PersonController.cs" />
@@ -131,6 +132,19 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Infrastructure\AppSettings.cs" />
+    <Compile Include="Infrastructure\GitHub\Data\GitHubUserEmailInfo.cs" />
+    <Compile Include="Infrastructure\GitHub\Data\GitHubUserInfo.cs" />
+    <Compile Include="Infrastructure\GitHub\GitHubUser.cs" />
+    <Compile Include="Infrastructure\Helpers\AppSettingsHelper.cs" />
+    <Compile Include="Infrastructure\Helpers\CultureHelper.cs" />
+    <Compile Include="Infrastructure\GitHub\GitHubHelper.cs" />
+    <Compile Include="Infrastructure\Helpers\GitTimeException.cs" />
+    <Compile Include="Infrastructure\Helpers\NumberHelper.cs" />
+    <Compile Include="Infrastructure\Text\TextHelper.cs" />
+    <Compile Include="Infrastructure\Web\GitTimeAuthenticationModule.cs" />
+    <Compile Include="Infrastructure\Web\GitTimeUser.cs" />
+    <Compile Include="Models\Database\AccessToken.cs" />
     <Compile Include="Models\Database\Company.cs" />
     <Compile Include="Models\Database\Contact.cs" />
     <Compile Include="Models\Database\ContactFilter.cs" />
@@ -269,6 +283,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Views\GitHub\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />

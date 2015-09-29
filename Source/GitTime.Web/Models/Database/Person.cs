@@ -2,7 +2,7 @@
 
 namespace GitTime.Web.Models.Database
 {
-    public class Person: Contact
+    public class Person : Contact
     {
         [Required]
         [MaxLength(128)]

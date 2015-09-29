@@ -8,17 +8,17 @@ namespace GitTime.Web.Models
     {
         protected override void Seed(GitTimeContext db)
         {
-            db.Persons.Add(new Person { Email = "a", Password = "a", FirstName = "Aleksey", LastName = "Terzi" });
+            db.Persons.Add(new Person { Email = "test@email.com", Password = "password", FirstName = "First", LastName = "User" });
 
-            Company insite, keyera, millerDatabases;
+            Company company1, company2, company3;
 
-            db.Companies.Add(insite = new Company { Name = "InSite" });
-            db.Companies.Add(keyera = new Company { Name = "Keyera" });
-            db.Companies.Add(millerDatabases = new Company { Name = "Miller Databases" });
+            db.Companies.Add(company1 = new Company { Name = "Company #1" });
+            db.Companies.Add(company2 = new Company { Name = "Company #2" });
+            db.Companies.Add(company3 = new Company { Name = "Company #3" });
 
-            db.Projects.Add(new Project { Company = insite, Name = "Iris", Repository = "InSite/Iris" });
-            db.Projects.Add(new Project { Company = keyera, Name = "Cmds", Repository = "InSite/Cmds" });
-            db.Projects.Add(new Project { Company = millerDatabases, Name = "Lemar", Repository = "MillerDatabases/Lemar" });
+            db.Projects.Add(new Project { Company = company1, Name = "Project #1", Repository = "Company_1/Project_1" });
+            db.Projects.Add(new Project { Company = company2, Name = "Project #2", Repository = "Company_2/Project_2" });
+            db.Projects.Add(new Project { Company = company3, Name = "Project #3", Repository = "Company_3/Project_3" });
 
             base.Seed(db);
         }

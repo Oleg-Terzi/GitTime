@@ -10,7 +10,7 @@ using GitTime.Web.Models.Database;
 
 namespace GitTime.Web.Models
 {
-    public class GitTimeContext: DbContext
+    public class GitTimeContext : DbContext
     {
         #region Construction
 
@@ -42,6 +42,7 @@ namespace GitTime.Web.Models
         public DbSet<Person> Persons { get; set; }
         public DbSet<Project> Projects { get; set; }
         public DbSet<Timecard> Timecards { get; set; }
+        public DbSet<AccessToken> AccessTokens { get; set; }
 
         #endregion
 
@@ -50,7 +51,7 @@ namespace GitTime.Web.Models
         public static void AddParameter(string name, SqlDbType dbType, object value, ICollection<SqlParameter> parameters)
         {
             var param = new SqlParameter(name, dbType);
-            param.Value = value != null ? value: DBNull.Value;
+            param.Value = value != null ? value : DBNull.Value;
 
             parameters.Add(param);
         }
