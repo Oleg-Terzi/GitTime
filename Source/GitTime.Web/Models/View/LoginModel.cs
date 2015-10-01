@@ -1,15 +1,16 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace GitTime.Web.Models.View
 {
     public class LoginModel
     {
         [Required]
-        public string Email { get; set; }
+        public String Email { get; set; }
 
         [Required]
-        public string Password { get; set; }
+        public String Password { get; set; }
 
-        public bool RememberMe { get; set; }
+        public Boolean RememberMe { get; set; }
     }
 }

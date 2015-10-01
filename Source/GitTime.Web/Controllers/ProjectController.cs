@@ -1,5 +1,8 @@
-﻿using System.Data.Entity;
+﻿using System;
+using System.Data.Entity;
 using System.Linq;
+using System.Security.Principal;
+using System.Threading.Tasks;
 
 using GitTime.Web.Models;
 using GitTime.Web.Models.Database;
@@ -10,14 +13,23 @@ namespace GitTime.Web.Controllers
 {
     public class ProjectController : BaseFinderController<FinderModel, ProjectFilter>
     {
+        #region Security
+
+        protected override Boolean CanView(IPrincipal principal)
+        {
+            return principal.IsInRole(Constants.RoleType.Administrator);
+        }
+
+        #endregion
+
         #region Properties
 
-        protected override string SingleEntityName
+        protected override String SingleEntityName
         {
             get { return "Project"; }
         }
 
-        protected override string MultiEntityName
+        protected override String MultiEntityName
         {
             get { return "Projects"; }
         }
@@ -56,16 +68,16 @@ namespace GitTime.Web.Controllers
             };
         }
 
-        protected override void InitCreate(FinderModel model)
+        protected override async Task InitCreate(FinderModel model)
         {
             model.Edit = new EditorModel();
         }
 
-        protected override void InitEdit(FinderModel model)
+        protected override async Task InitEdit(FinderModel model)
         {
             using (var db = new GitTimeContext())
             {
-                model.Edit = db.Projects
+                model.Edit = await db.Projects
                     .Where(p => p.ID == model.Key.Value)
                     .Select(p => new EditorModel
                     {
@@ -74,37 +86,36 @@ namespace GitTime.Web.Controllers
                         Name = p.Name,
                         Description = p.Description,
                         Repository = p.Repository
-                    }).First();
+                    }).FirstAsync();
             }
         }
 
         #endregion
-
-
+        
         #region Database methods
 
-        protected override int Count(ProjectFilter filter)
+        protected override async Task<Int32> Count(ProjectFilter filter)
         {
             using (var db = new GitTimeContext())
             {
-                return db.Projects.Count(filter);
+                return await db.Projects.CountAsync(filter);
             }
         }
 
-        protected override object Select(int startRow, int endRow, ProjectFilter filter)
+        protected override async Task<Object> Select(Int32 startRow, Int32 endRow, ProjectFilter filter)
         {
             using (var db = new GitTimeContext())
-                return db.Projects.SelectFinderRows(startRow, endRow, filter, null);
+                return await db.Projects.SelectFinderRowsAsync(startRow, endRow, filter, null);
         }
 
-        protected override SaveResult SaveData(FinderModel model)
+        protected override async Task<SaveResult> SaveData(FinderModel model)
         {
             EditorModel editorModel = model.Edit;
 
             using (var db = new GitTimeContext())
             {
-                Project row = editorModel.ID.HasValue
-                    ? db.Projects.Find(editorModel.ID.Value)
+                var row = editorModel.ID.HasValue
+                    ? await db.Projects.FindAsync(editorModel.ID.Value)
                     : new Project();
 
                 if (row == null)
@@ -123,17 +134,17 @@ namespace GitTime.Web.Controllers
                 else
                     db.Projects.Add(row);
 
-                db.SaveChanges();
+                await db.SaveChangesAsync();
             }
 
             return editorModel.ID.HasValue ? SaveResult.Edited : SaveResult.Added;
         }
 
-        protected override void DeleteData(FinderModel model)
+        protected override async Task DeleteData(FinderModel model)
         {
-            using (GitTimeContext db = new GitTimeContext())
+            using (var db = new GitTimeContext())
             {
-                db.Projects.Delete(model.Key.Value);
+                await db.Projects.DeleteAsync(model.Key.Value);
             }
         }
 

@@ -12,24 +12,24 @@ namespace GitTime.Web.UI.Selectors
         public static MvcHtmlString GetSelector<TModel, TProperty>(
             HtmlHelper<TModel> htmlHelper,
             Expression<Func<TModel, TProperty>> expression,
-            object htmlAttributes,
-            bool validate,
-            bool addEmpty,
-            string emptyMessage,
+            Object htmlAttributes,
+            Boolean validate,
+            Boolean addEmpty,
+            String emptyMessage,
             IEnumerable<DataItem> dataSource
             )
         {
-            string name = htmlHelper.ViewContext.ViewData.TemplateInfo.GetFullHtmlFieldName(ExpressionHelper.GetExpressionText(expression));
-            string id = htmlHelper.ViewContext.ViewData.TemplateInfo.GetFullHtmlFieldId(ExpressionHelper.GetExpressionText(expression));
+            String name = htmlHelper.ViewContext.ViewData.TemplateInfo.GetFullHtmlFieldName(ExpressionHelper.GetExpressionText(expression));
+            String id = htmlHelper.ViewContext.ViewData.TemplateInfo.GetFullHtmlFieldId(ExpressionHelper.GetExpressionText(expression));
 
             ModelMetadata metadata = ModelMetadata.FromLambdaExpression(expression, htmlHelper.ViewData);
             RouteValueDictionary routeValueDictionary = htmlAttributes != null ? new RouteValueDictionary(htmlAttributes) : new RouteValueDictionary();
 
-            string selectedValue = (metadata.Model ?? "").ToString();
+            String selectedValue = (metadata.Model ?? "").ToString();
 
             var select = new TagBuilder("select");
 
-            if (!string.IsNullOrEmpty(id))
+            if (!String.IsNullOrEmpty(id))
                 select.Attributes.Add("id", id);
             
             select.Attributes["name"] = name;
@@ -45,7 +45,7 @@ namespace GitTime.Web.UI.Selectors
             return MvcHtmlString.Create(select.ToString(TagRenderMode.Normal));
         }
 
-        private static string GetOptions(string selectedValue, bool allowNull, string emptyMessage, IEnumerable<DataItem> dataSource)
+        private static String GetOptions(String selectedValue, Boolean allowNull, String emptyMessage, IEnumerable<DataItem> dataSource)
         {
             var options = new StringBuilder();
 
@@ -62,7 +62,7 @@ namespace GitTime.Web.UI.Selectors
                 var option = new TagBuilder("option");
                 option.Attributes["value"] = item.Value;
 
-                if (string.Equals(item.Value, selectedValue, StringComparison.OrdinalIgnoreCase))
+                if (String.Equals(item.Value, selectedValue, StringComparison.OrdinalIgnoreCase))
                     option.Attributes["selected"] = "selected";
 
                 option.InnerHtml = item.Text;

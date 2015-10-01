@@ -6,9 +6,9 @@ using System.Web.Mvc;
 
 namespace GitTime.Web.Controllers
 {
-    public class GitHubController : Controller
+    public class IssueController : Controller
     {
-        // GET: GitHub
+        // GET: Issue
         public ActionResult Index()
         {
             return View();

@@ -6,21 +6,21 @@ namespace GitTime.Web.Models.View.Timecard
 {
     public class EditorModel
     {
-        public int? ID { get; set; }
+        public Int32? ID { get; set; }
 
         public DateTime EntryDate { get; set; }
 
         [Required]
-        public int? PersonContactID { get; set; }
+        public Int32? PersonContactID { get; set; }
 
         [Required]
-        public int? ProjectID { get; set; }
+        public Int32? ProjectID { get; set; }
 
-        public int? IssueNumber { get; set; }
+        public Int32? IssueNumber { get; set; }
 
-        public string IssueDescription { get; set; }
+        public String IssueDescription { get; set; }
 
         [Required]
-        public decimal? Hours { get; set; }
+        public Decimal? Hours { get; set; }
     }
 }

@@ -2,14 +2,15 @@
 using System.IO;
 using System.Net;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Threading.Tasks;
 using System.Web.Mvc;
-
+using GitTime.Web.Infrastructure.Helpers;
 using GitTime.Web.Models.View;
 
 namespace GitTime.Web.Controllers
 {
-    public abstract class BaseFinderController<ModelType, FilterType>: BaseController
-        where ModelType: new()
+    public abstract class BaseFinderController<ModelType, FilterType> : BaseController
+        where ModelType : new()
     {
         #region Enums
 
@@ -19,14 +20,14 @@ namespace GitTime.Web.Controllers
 
         #region Properties
 
-        protected abstract string SingleEntityName { get; }
-        protected abstract string MultiEntityName { get; }
+        protected abstract String SingleEntityName { get; }
+        protected abstract String MultiEntityName { get; }
 
         #endregion
 
         #region Actions
 
-        public ActionResult Find()
+        public async Task<ActionResult> Find()
         {
             var filter = GetInitFilter();
             var model = new ModelType();
@@ -39,13 +40,13 @@ namespace GitTime.Web.Controllers
 
             InitModel(model, searchResults, filter);
 
-            LoadData(searchResults, filter);
+            await LoadData(searchResults, filter);
 
             return View(model);
         }
 
         [HttpPost]
-        public ActionResult Search(ModelType model)
+        public async Task<ActionResult> Search(ModelType model)
         {
             FilterType filter = GetFilterBySearchCriteria(model);
 
@@ -57,48 +58,48 @@ namespace GitTime.Web.Controllers
 
             InitModel(model, searchResults, filter);
 
-            LoadData(searchResults, filter);
+            await LoadData(searchResults, filter);
 
-            ModelState.Clear();//Allows to re-bind strongly typed controls from model rather than from model state
+            ModelState.Clear(); //Allows to re-bind strongly typed controls from model rather than from model state
 
             return View("Find", model);
         }
 
         [HttpPost]
-        public ActionResult ChangePage(ModelType model)
+        public async Task<ActionResult> ChangePage(ModelType model)
         {
             var searchResults = GetSearchResults(model);
             var filter = DeserializeFilter(searchResults.SerializedFilter);
 
-            LoadData(searchResults, filter);
+            await LoadData(searchResults, filter);
 
             return PartialView("SearchResults", model);
         }
 
         [HttpPost]
-        public ActionResult Create(ModelType model)
+        public async Task<ActionResult> Create(ModelType model)
         {
-            InitCreate(model);
+            await InitCreate(model);
 
             return PartialView("Edit", model);
         }
 
         [HttpPost]
-        public ActionResult Edit(ModelType model)
+        public async Task<ActionResult> Edit(ModelType model)
         {
-            InitEdit(model);
+            await InitEdit(model);
 
             return PartialView("Edit", model);
         }
 
         [HttpPost]
-        public ActionResult Save(ModelType model)
+        public async Task<ActionResult> Save(ModelType model)
         {
             SaveResult result;
 
-            if (!ModelState.IsValid || (result = SaveData(model)) == SaveResult.NotSaved)
+            if (!ModelState.IsValid || (result = await SaveData(model)) == SaveResult.NotSaved)
             {
-                Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                Response.StatusCode = (Int32)HttpStatusCode.BadRequest;
 
                 return PartialView("Edit", model);
             }
@@ -106,7 +107,7 @@ namespace GitTime.Web.Controllers
             var searchResults = GetSearchResults(model);
             var filter = DeserializeFilter(searchResults.SerializedFilter);
 
-            LoadData(searchResults, filter);
+            await LoadData(searchResults, filter);
 
             ViewBag.Operation = result == SaveResult.Edited ? "Edited" : "Added";
 
@@ -114,14 +115,14 @@ namespace GitTime.Web.Controllers
         }
 
         [HttpPost]
-        public ActionResult Delete(ModelType model)
+        public async Task<ActionResult> Delete(ModelType model)
         {
-            DeleteData(model);
+            await DeleteData(model);
 
             var searchResults = GetSearchResults(model);
             var filter = DeserializeFilter(searchResults.SerializedFilter);
 
-            LoadData(searchResults, filter);
+            await LoadData(searchResults, filter);
 
             ViewBag.Operation = "Deleted";
 
@@ -137,24 +138,24 @@ namespace GitTime.Web.Controllers
         protected abstract BaseSearchResultsModel GetSearchResults(ModelType model);
 
         protected abstract void InitModel(ModelType model, BaseSearchResultsModel searchResults, FilterType filter);
-        protected abstract void InitCreate(ModelType model);
-        protected abstract void InitEdit(ModelType model);
+        protected abstract Task InitCreate(ModelType model);
+        protected abstract Task InitEdit(ModelType model);
 
         #endregion
 
         #region Database methods
 
-        protected abstract int Count(FilterType filter);
-        protected abstract object Select(int startRow, int endRow, FilterType filter);
+        protected abstract Task<Int32> Count(FilterType filter);
+        protected abstract Task<Object> Select(Int32 startRow, Int32 endRow, FilterType filter);
 
-        protected abstract SaveResult SaveData(ModelType model);
-        protected abstract void DeleteData(ModelType model);
+        protected abstract Task<SaveResult> SaveData(ModelType model);
+        protected abstract Task DeleteData(ModelType model);
 
-        private void LoadData(BaseSearchResultsModel searchResults, FilterType filter)
+        private async Task LoadData(BaseSearchResultsModel searchResults, FilterType filter)
         {
-            int startRow, endRow, rowCount, pageCount;
+            Int32 startRow, endRow, rowCount, pageCount;
 
-            rowCount = Count(filter);
+            rowCount = await Count(filter);
 
             pageCount = rowCount / Constants.PageSize;
 
@@ -170,7 +171,7 @@ namespace GitTime.Web.Controllers
             if (endRow > rowCount)
                 endRow = rowCount;
 
-            ViewBag.DataSource = Select(startRow, endRow, filter);
+            ViewBag.DataSource = await Select(startRow, endRow, filter);
             ViewBag.SingleEntityName = SingleEntityName;
             ViewBag.MultiEntityName = MultiEntityName;
             ViewBag.SerializedFilter = searchResults.SerializedFilter;
@@ -185,28 +186,28 @@ namespace GitTime.Web.Controllers
 
         #region Serialization
 
-        private string SerializeFilter(FilterType filter)
+        private String SerializeFilter(FilterType filter)
         {
             byte[] buffer;
 
-            using (MemoryStream stream = new MemoryStream())
+            using (var stream = new MemoryStream())
             {
                 new BinaryFormatter().Serialize(stream, filter);
 
                 buffer = new byte[stream.Length];
 
                 stream.Position = 0;
-                stream.Read(buffer, 0, (int)stream.Length);
+                stream.Read(buffer, 0, (Int32)stream.Length);
             }
 
             return Convert.ToBase64String(buffer);
         }
 
-        private FilterType DeserializeFilter(string serializedFilter)
+        private FilterType DeserializeFilter(String serializedFilter)
         {
-            byte[] buffer = Convert.FromBase64String(serializedFilter);
+            Byte[] buffer = Convert.FromBase64String(serializedFilter);
 
-            using (MemoryStream stream = new MemoryStream(buffer))
+            using (var stream = new MemoryStream(buffer))
             {
                 return (FilterType)(new BinaryFormatter().Deserialize(stream));
             }

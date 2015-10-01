@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GitTime.Web.Models.Database
@@ -10,21 +11,21 @@ namespace GitTime.Web.Models.Database
 
         [Key]
         [Column("pk_ID")]
-        public int ID { get; set; }
+        public Int32 ID { get; set; }
 
         [Required]
         [Column("fk_CompanyContactID")]
-        public int CompanyContactID { get; set; }
+        public Int32 CompanyContactID { get; set; }
 
         [Required]
         [MaxLength(128)]
-        public string Name { get; set; }
+        public String Name { get; set; }
 
-        public string Description { get; set; }
+        public String Description { get; set; }
 
         [Required]
         [MaxLength(128)]
-        public string Repository { get; set; }
+        public String Repository { get; set; }
 
         #endregion
 

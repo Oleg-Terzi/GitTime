@@ -1,8 +1,10 @@
-﻿namespace GitTime.Web.UI.Selectors
+﻿using System;
+
+namespace GitTime.Web.UI.Selectors
 {
     public class DataItem
     {
-        public string Value { get; set; }
-        public string Text { get; set; }
+        public String Value { get; set; }
+        public String Text { get; set; }
     }
 }

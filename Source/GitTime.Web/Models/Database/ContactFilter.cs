@@ -5,8 +5,8 @@ namespace GitTime.Web.Models.Database
     [Serializable]
     public class ContactFilter
     {
-        public string Subtype { get; set; }
-        public string Name { get; set; }
-        public string PersonName { get; set; }
+        public String Subtype { get; set; }
+        public String Name { get; set; }
+        public String PersonName { get; set; }
     }
 }

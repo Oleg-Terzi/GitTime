@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace GitTime.Web.Models.Database
 {
@@ -11,9 +13,9 @@ namespace GitTime.Web.Models.Database
     {
         #region SELECT
 
-        public static ICollection<ContactFinderRow> SelectFinderRows(this DbSet<Contact> dbSet, int startRow, int endRow, ContactFilter filter, string sortExpression)
+        public static async Task<ICollection<ContactFinderRow>> SelectFinderRowsAsync(this DbSet<Contact> dbSet, Int32 startRow, Int32 endRow, ContactFilter filter, String sortExpression)
         {
-            const string query = @"
+            const String query = @"
 WITH Contact AS
 (
     SELECT
@@ -34,62 +36,62 @@ WHERE RowNumber BETWEEN @StartRow AND @EndRow
 ORDER BY RowNumber
 ";
 
-            if (string.IsNullOrEmpty(sortExpression))
+            if (String.IsNullOrEmpty(sortExpression))
                 sortExpression = "ContactID";
 
-            string rowNumberOrderBy = sortExpression
+            String rowNumberOrderBy = sortExpression
                 .Replace("ContactID", "Contact.pk_ID")
                 ;
 
-            string where = CreateWhere(filter);
-            string curQuery = string.Format(query, where, rowNumberOrderBy);
+            String where = CreateWhere(filter);
+            String curQuery = String.Format(query, where, rowNumberOrderBy);
 
             ICollection<SqlParameter> parameters = CreateParameters(filter);
             GitTimeContext.AddParameter("@StartRow", SqlDbType.Int, startRow, parameters);
             GitTimeContext.AddParameter("@EndRow", SqlDbType.Int, endRow, parameters);
 
-            return GitTimeContext.GetContext(dbSet).Database.SqlQuery<ContactFinderRow>(curQuery, parameters.ToArray()).ToList();
+            return await GitTimeContext.GetContext(dbSet).Database.SqlQuery<ContactFinderRow>(curQuery, parameters.ToArray()).ToListAsync();
 
         }
 
-        public static int Count(this DbSet<Contact> dbSet, ContactFilter filter)
+        public static async Task<Int32> CountAsync(this DbSet<Contact> dbSet, ContactFilter filter)
         {
-            const string query = @"SELECT CAST(COUNT(*) AS INT) FROM c.Contact WHERE {0}";
+            const String query = @"SELECT CAST(COUNT(*) AS INT) FROM c.Contact WHERE {0}";
 
-            string where = CreateWhere(filter);
-            string curQuery = string.Format(query, where);
+            String where = CreateWhere(filter);
+            String curQuery = String.Format(query, where);
 
             ICollection<SqlParameter> parameters = CreateParameters(filter);
 
-            return GitTimeContext.GetContext(dbSet).Database.SqlQuery<int>(curQuery, parameters.ToArray()).FirstOrDefault();
+            return await GitTimeContext.GetContext(dbSet).Database.SqlQuery<Int32>(curQuery, parameters.ToArray()).FirstOrDefaultAsync();
         }
 
         #endregion
 
         #region DELETE
 
-        public static void Delete(this DbSet<Contact> dbSet, int id)
+        public static async Task DeleteAsync(this DbSet<Contact> dbSet, Int32 id)
         {
-            const string query = "DELETE c.Contact WHERE pk_ID = @ID";
+            const String query = "DELETE c.Contact WHERE pk_ID = @ID";
 
-            GitTimeContext.GetContext(dbSet).Database.ExecuteSqlCommand(query, new SqlParameter("@ID", id));
+            await GitTimeContext.GetContext(dbSet).Database.ExecuteSqlCommandAsync(query, new SqlParameter("@ID", id));
         }
 
         #endregion
 
         #region Helper methods
 
-        private static string CreateWhere(ContactFilter filter)
+        private static String CreateWhere(ContactFilter filter)
         {
-            StringBuilder where = new StringBuilder("1 = 1");
+            var where = new StringBuilder("1 = 1");
 
-            if (!string.IsNullOrEmpty(filter.Subtype))
+            if (!String.IsNullOrEmpty(filter.Subtype))
                 where.Append(" AND Contact.Subtype = @Subtype");
 
-            if (!string.IsNullOrEmpty(filter.Name))
+            if (!String.IsNullOrEmpty(filter.Name))
                 where.Append(" AND Contact.Name LIKE @Name");
 
-            if (!string.IsNullOrEmpty(filter.PersonName))
+            if (!String.IsNullOrEmpty(filter.PersonName))
                 where.Append(" AND (Contact.FirstName + ' ' + Contact.LastName LIKE @PersonName OR Contact.LastName + ', ' + Contact.FirstName LIKE @PersonName)");
 
             return where.ToString();
@@ -97,15 +99,15 @@ ORDER BY RowNumber
 
         private static ICollection<SqlParameter> CreateParameters(ContactFilter filter)
         {
-            List<SqlParameter> parameters = new List<SqlParameter>();
+            var parameters = new List<SqlParameter>();
 
-            if (!string.IsNullOrEmpty(filter.Subtype))
+            if (!String.IsNullOrEmpty(filter.Subtype))
                 GitTimeContext.AddParameter("@Subtype", SqlDbType.NVarChar, filter.Subtype, parameters);
 
-            if (!string.IsNullOrEmpty(filter.Name))
+            if (!String.IsNullOrEmpty(filter.Name))
                 GitTimeContext.AddParameterForLike("@Name", filter.Name, parameters);
 
-            if (!string.IsNullOrEmpty(filter.PersonName))
+            if (!String.IsNullOrEmpty(filter.PersonName))
                 GitTimeContext.AddParameterForLike("@PersonName", filter.PersonName, parameters);
 
             return parameters;

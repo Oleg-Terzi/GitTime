@@ -4,12 +4,12 @@ namespace GitTime.Web.Models.Database
 {
     public class TimecardFinderRow
     {
-        public int TimecardID { get; set; }
+        public Int32 TimecardID { get; set; }
         public DateTime EntryDate { get; set; }
-        public string PersonName { get; set;}
-        public string Repository { get; set; }
-        public string CompanyName { get; set; }
-        public string IssueDescription { get; set; }
-        public decimal Hours { get; set; }
+        public String PersonName { get; set; }
+        public String Repository { get; set; }
+        public String CompanyName { get; set; }
+        public String IssueDescription { get; set; }
+        public Decimal Hours { get; set; }
     }
 }

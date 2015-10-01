@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace GitTime.Web.Models.Database
 {
@@ -11,9 +13,9 @@ namespace GitTime.Web.Models.Database
     {
         #region SELECT
 
-        public static ICollection<TimecardFinderRow> SelectFinderRows(this DbSet<Timecard> dbSet, int startRow, int endRow, TimecardFilter filter, string sortExpression)
+        public static async Task<ICollection<TimecardFinderRow>> SelectFinderRowsAsync(this DbSet<Timecard> dbSet, Int32 startRow, Int32 endRow, TimecardFilter filter, String sortExpression)
         {
-            const string query = @"
+            const String query = @"
 WITH Timecard AS
 (
     SELECT
@@ -38,66 +40,66 @@ WHERE RowNumber BETWEEN @StartRow AND @EndRow
 ORDER BY RowNumber
 ";
 
-            if (string.IsNullOrEmpty(sortExpression))
+            if (String.IsNullOrEmpty(sortExpression))
                 sortExpression = "EntryDate DESC, TimecardID DESC";
 
-            string rowNumberOrderBy = sortExpression
+            String rowNumberOrderBy = sortExpression
                 .Replace("TimecardID", "Timecard.pk_ID")
                 ;
 
-            string where = CreateWhere(filter);
-            string curQuery = string.Format(query, where, rowNumberOrderBy);
+            String where = CreateWhere(filter);
+            String curQuery = String.Format(query, where, rowNumberOrderBy);
 
             ICollection<SqlParameter> parameters = CreateParameters(filter);
             GitTimeContext.AddParameter("@StartRow", SqlDbType.Int, startRow, parameters);
             GitTimeContext.AddParameter("@EndRow", SqlDbType.Int, endRow, parameters);
 
-            return GitTimeContext.GetContext(dbSet).Database.SqlQuery<TimecardFinderRow>(curQuery, parameters.ToArray()).ToList();
+            return await GitTimeContext.GetContext(dbSet).Database.SqlQuery<TimecardFinderRow>(curQuery, parameters.ToArray()).ToListAsync();
 
         }
 
-        public static int Count(this DbSet<Timecard> dbSet, TimecardFilter filter)
+        public static async Task<Int32> CountAsync(this DbSet<Timecard> dbSet, TimecardFilter filter)
         {
-            const string query = @"SELECT CAST(COUNT(*) AS INT) FROM t.Timecard WHERE {0}";
+            const String query = @"SELECT CAST(COUNT(*) AS INT) FROM t.Timecard WHERE {0}";
 
-            string where = CreateWhere(filter);
-            string curQuery = string.Format(query, where);
+            String where = CreateWhere(filter);
+            String curQuery = String.Format(query, where);
 
             ICollection<SqlParameter> parameters = CreateParameters(filter);
 
-            return GitTimeContext.GetContext(dbSet).Database.SqlQuery<int>(curQuery, parameters.ToArray()).FirstOrDefault();
+            return await GitTimeContext.GetContext(dbSet).Database.SqlQuery<Int32>(curQuery, parameters.ToArray()).FirstOrDefaultAsync();
         }
 
-        public static decimal SumHours(this DbSet<Timecard> dbSet, TimecardFilter filter)
+        public static async Task<Decimal> SumHoursAsync(this DbSet<Timecard> dbSet, TimecardFilter filter)
         {
-            const string query = @"SELECT SUM(Hours) FROM t.Timecard WHERE {0}";
+            const String query = @"SELECT SUM(Hours) FROM t.Timecard WHERE {0}";
 
-            string where = CreateWhere(filter);
-            string curQuery = string.Format(query, where);
+            String where = CreateWhere(filter);
+            String curQuery = String.Format(query, where);
 
             ICollection<SqlParameter> parameters = CreateParameters(filter);
 
-            return GitTimeContext.GetContext(dbSet).Database.SqlQuery<decimal?>(curQuery, parameters.ToArray()).FirstOrDefault() ?? 0;
+            return await GitTimeContext.GetContext(dbSet).Database.SqlQuery<Decimal?>(curQuery, parameters.ToArray()).FirstOrDefaultAsync() ?? 0;
         }
 
         #endregion
 
         #region DELETE
 
-        public static void Delete(this DbSet<Timecard> dbSet, int id)
+        public static async Task DeleteAsync(this DbSet<Timecard> dbSet, Int32 id)
         {
-            const string query = "DELETE t.Timecard WHERE pk_ID = @ID";
+            const String query = "DELETE t.Timecard WHERE pk_ID = @ID";
 
-            GitTimeContext.GetContext(dbSet).Database.ExecuteSqlCommand(query, new SqlParameter("@ID", id));
+            await GitTimeContext.GetContext(dbSet).Database.ExecuteSqlCommandAsync(query, new SqlParameter("@ID", id));
         }
 
         #endregion
 
         #region Helper methods
 
-        private static string CreateWhere(TimecardFilter filter)
+        private static String CreateWhere(TimecardFilter filter)
         {
-            StringBuilder where = new StringBuilder("1 = 1");
+            var where = new StringBuilder("1 = 1");
 
             if (filter.ProjectID.HasValue)
                 where.Append(" AND Timecard.fk_ProjectID = @ProjectID");
@@ -116,7 +118,7 @@ ORDER BY RowNumber
 
         private static ICollection<SqlParameter> CreateParameters(TimecardFilter filter)
         {
-            List<SqlParameter> parameters = new List<SqlParameter>();
+            var parameters = new List<SqlParameter>();
 
             if (filter.ProjectID.HasValue)
                 GitTimeContext.AddParameter("@ProjectID", SqlDbType.Int, filter.ProjectID, parameters);

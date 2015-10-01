@@ -48,11 +48,7 @@ namespace GitTime.Web.Infrastructure.Web
             if (authTicket == null || authTicket.Expired)
                 return;
 
-            var user = await GitTimeUser.Open(authTicket.Name);
-            if (!user.IsAuthenticated)
-                return;
-
-            context.User = user;
+            context.User = await GitTimeUser.Open(authTicket.Name);
         }
 
         #endregion

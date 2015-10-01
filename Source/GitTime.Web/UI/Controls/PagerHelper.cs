@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using System.Web.Mvc;
 
 namespace GitTime.Web.UI.Controls
@@ -7,9 +8,9 @@ namespace GitTime.Web.UI.Controls
     {
         #region Extensions
 
-        public static MvcHtmlString Pager<TModel>(this HtmlHelper<TModel> htmlHelper, string multiEntityName, int startRow, int endRow, int rowCount, int pageIndex, int pageCount)
+        public static MvcHtmlString Pager<TModel>(this HtmlHelper<TModel> htmlHelper, String multiEntityName, Int32 startRow, Int32 endRow, Int32 rowCount, Int32 pageIndex, Int32 pageCount)
         {
-            int startPage = Constants.VisiblePageCount * (pageIndex / Constants.VisiblePageCount);
+            Int32 startPage = Constants.VisiblePageCount * (pageIndex / Constants.VisiblePageCount);
 
             StringBuilder html = new StringBuilder();
             html.AppendLine(@"<div class=""row"">");
@@ -22,9 +23,9 @@ namespace GitTime.Web.UI.Controls
 
                 AddPreviousLinks(pageIndex, html);
 
-                for (int i = startPage; i < pageCount && i < startPage + Constants.VisiblePageCount; i++)
+                for (Int32 i = startPage; i < pageCount && i < startPage + Constants.VisiblePageCount; i++)
                 {
-                    string className = i == pageIndex ? "active": "";
+                    String className = i == pageIndex ? "active" : "";
 
                     html.AppendFormat(@"<li class=""{0}""><a href=""#"" onclick=""_finder.changePage({1}); return false;"">{2}</a></li>", className, i, i + 1);
                     html.AppendLine();
@@ -48,9 +49,9 @@ namespace GitTime.Web.UI.Controls
 
         #region Helper methods
 
-        private static void AddPreviousLinks(int pageIndex, StringBuilder html)
+        private static void AddPreviousLinks(Int32 pageIndex, StringBuilder html)
         {
-            int startPage = Constants.VisiblePageCount * (pageIndex / Constants.VisiblePageCount);
+            Int32 startPage = Constants.VisiblePageCount * (pageIndex / Constants.VisiblePageCount);
 
             if (pageIndex == 0)
             {
@@ -70,9 +71,9 @@ namespace GitTime.Web.UI.Controls
                 html.AppendFormat(@"<li><a href=""#"" title=""Previous Pages"" onclick=""_finder.changePage({0}); return false;"">...</a></li>", startPage - 1);
         }
 
-        private static void AddNextLinks(int pageIndex, int pageCount, StringBuilder html)
+        private static void AddNextLinks(Int32 pageIndex, Int32 pageCount, StringBuilder html)
         {
-            int startPage = Constants.VisiblePageCount * (pageIndex / Constants.VisiblePageCount);
+            Int32 startPage = Constants.VisiblePageCount * (pageIndex / Constants.VisiblePageCount);
 
             if (startPage + Constants.VisiblePageCount < pageCount)
                 html.AppendFormat(@"<li><a href=""#"" title=""Next Pages"" onclick=""_finder.changePage({0}); return false;"">...</a></li>", startPage + Constants.VisiblePageCount);

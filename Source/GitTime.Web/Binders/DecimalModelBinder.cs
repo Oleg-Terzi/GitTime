@@ -6,18 +6,18 @@ namespace GitTime.Web.Binders
 {
     public class DecimalModelBinder : DefaultModelBinder
     {
-        public override object BindModel(ControllerContext controllerContext, ModelBindingContext bindingContext)
+        public override Object BindModel(ControllerContext controllerContext, ModelBindingContext bindingContext)
         {
             ValueProviderResult value = bindingContext.ValueProvider.GetValue(bindingContext.ModelName);
 
             if (value != null)
             {
-                decimal dec;
+                Decimal dec;
 
-                if (decimal.TryParse(value.AttemptedValue, NumberStyles.Any, CultureInfo.InvariantCulture, out dec))
+                if (Decimal.TryParse(value.AttemptedValue, NumberStyles.Any, CultureInfo.InvariantCulture, out dec))
                     return dec;
 
-                bindingContext.ModelState.AddModelError(bindingContext.ModelName, string.Format("{0} is an invalid numeric format", value.AttemptedValue));
+                bindingContext.ModelState.AddModelError(bindingContext.ModelName, String.Format("{0} is an invalid numeric format", value.AttemptedValue));
             }
 
             return base.BindModel(controllerContext, bindingContext);

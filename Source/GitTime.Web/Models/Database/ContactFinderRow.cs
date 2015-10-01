@@ -1,12 +1,14 @@
-﻿namespace GitTime.Web.Models.Database
+﻿using System;
+
+namespace GitTime.Web.Models.Database
 {
     public class ContactFinderRow
     {
-        public int ContactID { get; set; }
-        public string Name { get; set; }
-        public string Email { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string Subtype { get; set; }
+        public Int32 ContactID { get; set; }
+        public String Name { get; set; }
+        public String Email { get; set; }
+        public String FirstName { get; set; }
+        public String LastName { get; set; }
+        public String Subtype { get; set; }
     }
 }

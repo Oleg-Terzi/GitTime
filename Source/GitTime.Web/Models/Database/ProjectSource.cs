@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace GitTime.Web.Models.Database
 {
@@ -11,9 +13,9 @@ namespace GitTime.Web.Models.Database
     {
         #region SELECT
 
-        public static ICollection<ProjectFinderRow> SelectFinderRows(this DbSet<Project> dbSet, int startRow, int endRow, ProjectFilter filter, string sortExpression)
+        public static async Task<ICollection<ProjectFinderRow>> SelectFinderRowsAsync(this DbSet<Project> dbSet, Int32 startRow, Int32 endRow, ProjectFilter filter, String sortExpression)
         {
-            const string query = @"
+            const String query = @"
 WITH Project AS
 (
     SELECT
@@ -33,54 +35,54 @@ WHERE RowNumber BETWEEN @StartRow AND @EndRow
 ORDER BY RowNumber
 ";
 
-            if (string.IsNullOrEmpty(sortExpression))
+            if (String.IsNullOrEmpty(sortExpression))
                 sortExpression = "ProjectName";
 
-            string rowNumberOrderBy = sortExpression
+            String rowNumberOrderBy = sortExpression
                 .Replace("ProjectName", "Project.Name")
                 ;
 
-            string where = CreateWhere(filter);
-            string curQuery = string.Format(query, where, rowNumberOrderBy);
+            String where = CreateWhere(filter);
+            String curQuery = String.Format(query, where, rowNumberOrderBy);
 
             ICollection<SqlParameter> parameters = CreateParameters(filter);
             GitTimeContext.AddParameter("@StartRow", SqlDbType.Int, startRow, parameters);
             GitTimeContext.AddParameter("@EndRow", SqlDbType.Int, endRow, parameters);
 
-            return GitTimeContext.GetContext(dbSet).Database.SqlQuery<ProjectFinderRow>(curQuery, parameters.ToArray()).ToList();
+            return await GitTimeContext.GetContext(dbSet).Database.SqlQuery<ProjectFinderRow>(curQuery, parameters.ToArray()).ToListAsync();
 
         }
 
-        public static int Count(this DbSet<Project> dbSet, ProjectFilter filter)
+        public static async Task<Int32> CountAsync(this DbSet<Project> dbSet, ProjectFilter filter)
         {
-            const string query = @"SELECT CAST(COUNT(*) AS INT) FROM p.Project WHERE {0}";
+            const String query = @"SELECT CAST(COUNT(*) AS INT) FROM p.Project WHERE {0}";
 
-            string where = CreateWhere(filter);
-            string curQuery = string.Format(query, where);
+            String where = CreateWhere(filter);
+            String curQuery = String.Format(query, where);
 
             ICollection<SqlParameter> parameters = CreateParameters(filter);
 
-            return GitTimeContext.GetContext(dbSet).Database.SqlQuery<int>(curQuery, parameters.ToArray()).FirstOrDefault();
+            return await GitTimeContext.GetContext(dbSet).Database.SqlQuery<Int32>(curQuery, parameters.ToArray()).FirstOrDefaultAsync();
         }
 
         #endregion
 
         #region DELETE
 
-        public static void Delete(this DbSet<Project> dbSet, int id)
+        public static async Task DeleteAsync(this DbSet<Project> dbSet, Int32 id)
         {
-            const string query = "DELETE p.Project WHERE pk_ID = @ID";
+            const String query = "DELETE p.Project WHERE pk_ID = @ID";
 
-            GitTimeContext.GetContext(dbSet).Database.ExecuteSqlCommand(query, new SqlParameter("@ID", id));
+            await GitTimeContext.GetContext(dbSet).Database.ExecuteSqlCommandAsync(query, new SqlParameter("@ID", id));
         }
 
         #endregion
 
         #region Helper methods
 
-        private static string CreateWhere(ProjectFilter filter)
+        private static String CreateWhere(ProjectFilter filter)
         {
-            StringBuilder where = new StringBuilder("1 = 1");
+            var where = new StringBuilder("1 = 1");
 
             if (filter.CompanyContactID.HasValue)
                 where.Append(" AND Project.fk_CompanyContactID = @CompanyContactID");
@@ -90,7 +92,7 @@ ORDER BY RowNumber
 
         private static ICollection<SqlParameter> CreateParameters(ProjectFilter filter)
         {
-            List<SqlParameter> parameters = new List<SqlParameter>();
+            var parameters = new List<SqlParameter>();
 
             if (filter.CompanyContactID.HasValue)
                 GitTimeContext.AddParameter("@CompanyContactID", SqlDbType.Int, filter.CompanyContactID, parameters);

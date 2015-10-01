@@ -1,8 +1,10 @@
-﻿namespace GitTime.Web.Models.View.Project
+﻿using System;
+
+namespace GitTime.Web.Models.View.Project
 {
     public class FinderModel
     {
-        public int? Key { get; set; }
+        public Int32? Key { get; set; }
 
         public virtual BaseSearchResultsModel SearchResults { get; set; }
         public virtual SearchCriteriaModel SearchCriteria { get; set; }

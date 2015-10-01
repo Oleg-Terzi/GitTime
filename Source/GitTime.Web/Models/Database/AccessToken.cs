@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -15,9 +14,13 @@ namespace GitTime.Web.Models.Database
         public Int32 ID { get; set; }
 
         [Column("fk_ContactID")]
+        [ForeignKey("Contact")]
+        [Index("UNQ_AccessToken", 1, IsUnique = true)]
         public Int32 ContactID { get; set; }
 
         [Required]
+        [MaxLength(16)]
+        [Index("UNQ_AccessToken", 2, IsUnique = true)]
         public String Application { get; set; }
 
         [Required]
@@ -29,7 +32,7 @@ namespace GitTime.Web.Models.Database
         #endregion
 
         #region Entities
-
+        
         public Contact Contact { get; set; }
 
         #endregion

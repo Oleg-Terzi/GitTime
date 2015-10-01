@@ -2,7 +2,36 @@
 @using GitTime.Web.Infrastructure.GitHub
 
 @{
+    var gitTimeUser = GitTimeUser.Current;
     var gitHubUser = GitHubUser.GetCurrent();
+    var userName = gitHubUser.IsAuthenticated
+        ? String.Format(
+            "<img alt=\"\" style=\"width:20px; height:20px; margin-right:2px;\" src=\"{0}\"> {1} {2}",
+            gitHubUser.AvatarUrl, gitTimeUser.FirstName, gitTimeUser.LastName
+          )
+        : String.Format("{0} {1}", gitTimeUser.FirstName, gitTimeUser.LastName);
+
+    var isDeveloper = GitTimeUser.Current.IsInRole("Developer");
+    var isAdministrator = GitTimeUser.Current.IsInRole("Administrator");
+        
+    var userMenu = new List<List<MvcHtmlString>>();
+
+    if (isDeveloper || isAdministrator)
+    {
+        userMenu.Add(new List<MvcHtmlString>(new[] {
+            Html.ActionLink("Issues", "Index", "GitHub"),
+            Html.ActionLink("Timecards", "Find", "Timecard")
+        }));
+    }
+
+    if (isAdministrator)
+    {
+        userMenu.Add(new List<MvcHtmlString>(new[] {
+            Html.ActionLink("Companies", "Find", "Company"),
+            Html.ActionLink("Persons", "Find", "Person"),
+            Html.ActionLink("Projects", "Find", "Project")
+        }));
+    }
 }
 
 <!DOCTYPE html>
@@ -30,18 +59,35 @@
                 <ul class="nav navbar-nav">
                     @RenderSection("SearchCriteria", required: false)
 
-                    <li class="dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">GitHub <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li>@Html.ActionLink("Issues", "Index", "GitHub")</li>
-                        </ul>
-                    </li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
-                    <li><p class="navbar-text">
-                        @if (gitHubUser.IsAuthenticated) { <img alt="" style="width:20px; height:20px; margin-right:2px;" src="@gitHubUser.AvatarUrl"> }
-                        @GitTimeUser.Current.FirstName @GitTimeUser.Current.LastName
-                    </p></li>
+                    @if (userMenu.Count > 0)
+                    {
+                        <li class="dropdown">
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">@userName</a>
+
+                            <ul class="dropdown-menu">
+                                @for(var i = 0; i < userMenu.Count; i++)
+                                {
+                                    var items = userMenu[i];
+
+                                    if (i > 0)
+                                    {
+                                        <li role="separator" class="divider"></li>
+                                    }
+
+                                    foreach (var item in items)
+                                    {
+                                        <li>@item</li>
+                                    }
+                                }
+                            </ul>
+                        </li>
+                    }
+                    else
+                    {
+                        <li><p class="navbar-text">@userName</p></li>
+                    }
                     <li><a href="@Url.Action("Logout", "Login")"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
                 </ul>
             </div>

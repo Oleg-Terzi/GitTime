@@ -6,9 +6,9 @@ namespace GitTime.Web.Binders
 {
     public class DateTimeModelBinder: DefaultModelBinder
     {
-        public static string FormatString = "M\\/d\\/yyyy";
+        public static String FormatString = "M\\/d\\/yyyy";
 
-        public override object BindModel(ControllerContext controllerContext, ModelBindingContext bindingContext)
+        public override Object BindModel(ControllerContext controllerContext, ModelBindingContext bindingContext)
         {
             ValueProviderResult value = bindingContext.ValueProvider.GetValue(bindingContext.ModelName);
 
@@ -19,7 +19,7 @@ namespace GitTime.Web.Binders
                 if (DateTime.TryParseExact(value.AttemptedValue, FormatString, CultureInfo.InvariantCulture, DateTimeStyles.None, out date))
                     return date;
 
-                bindingContext.ModelState.AddModelError(bindingContext.ModelName, string.Format("{0} is an invalid date format", value.AttemptedValue));
+                bindingContext.ModelState.AddModelError(bindingContext.ModelName, String.Format("{0} is an invalid date format", value.AttemptedValue));
             }
 
             return base.BindModel(controllerContext, bindingContext);

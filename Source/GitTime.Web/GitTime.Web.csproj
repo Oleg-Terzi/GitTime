@@ -123,8 +123,8 @@
     <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\BaseFinderController.cs" />
     <Compile Include="Controllers\CompanyController.cs" />
-    <Compile Include="Controllers\GitHubController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\IssueController.cs" />
     <Compile Include="Controllers\LoginController.cs" />
     <Compile Include="Controllers\PersonController.cs" />
     <Compile Include="Controllers\ProjectController.cs" />
@@ -144,6 +144,19 @@
     <Compile Include="Infrastructure\Text\TextHelper.cs" />
     <Compile Include="Infrastructure\Web\GitTimeAuthenticationModule.cs" />
     <Compile Include="Infrastructure\Web\GitTimeUser.cs" />
+    <Compile Include="Migrations\201509301056155_InitialCreate.cs" />
+    <Compile Include="Migrations\201509301056155_InitialCreate.Designer.cs">
+      <DependentUpon>201509301056155_InitialCreate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201509301238320_AddAccessToken.cs" />
+    <Compile Include="Migrations\201509301238320_AddAccessToken.Designer.cs">
+      <DependentUpon>201509301238320_AddAccessToken.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201509301310116_AddPersonRoles.cs" />
+    <Compile Include="Migrations\201509301310116_AddPersonRoles.Designer.cs">
+      <DependentUpon>201509301310116_AddPersonRoles.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Database\AccessToken.cs" />
     <Compile Include="Models\Database\Company.cs" />
     <Compile Include="Models\Database\Contact.cs" />
@@ -154,6 +167,7 @@
     <Compile Include="Models\Database\ProjectFilter.cs" />
     <Compile Include="Models\Database\ProjectFinderRow.cs" />
     <Compile Include="Models\Database\ProjectSource.cs" />
+    <Compile Include="Models\Database\Role.cs" />
     <Compile Include="Models\Database\Timecard.cs" />
     <Compile Include="Models\Database\Person.cs" />
     <Compile Include="Models\Database\TimecardFilter.cs" />
@@ -280,13 +294,28 @@
     <Content Include="Views\Person\Edit.cshtml" />
     <Content Include="Views\Person\Find.cshtml" />
     <Content Include="Views\Person\SearchResults.cshtml" />
+    <Content Include="Views\Project\Find.cshtml" />
+    <Content Include="Views\Project\SearchResults.cshtml" />
+    <Content Include="Views\Project\Edit.cshtml" />
+    <Content Include="Views\Shared\_AccessDenied.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Views\GitHub\" />
+    <Folder Include="Views\Issue\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201509301056155_InitialCreate.resx">
+      <DependentUpon>201509301056155_InitialCreate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201509301238320_AddAccessToken.resx">
+      <DependentUpon>201509301238320_AddAccessToken.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201509301310116_AddPersonRoles.resx">
+      <DependentUpon>201509301310116_AddPersonRoles.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

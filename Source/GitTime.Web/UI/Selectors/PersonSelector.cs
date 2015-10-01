@@ -10,7 +10,7 @@ namespace GitTime.Web.UI.Selectors
 {
     public static class PersonSelector
     {
-        public static MvcHtmlString PersonSelectorFor<TModel, TProperty>(this HtmlHelper<TModel> htmlHelper, Expression<Func<TModel, TProperty>> expression, object htmlAttributes = null, bool validate = true)
+        public static MvcHtmlString PersonSelectorFor<TModel, TProperty>(this HtmlHelper<TModel> htmlHelper, Expression<Func<TModel, TProperty>> expression, Object htmlAttributes = null, Boolean validate = true)
         {
             IEnumerable<DataItem> dataSource;
 

@@ -26,9 +26,14 @@ namespace GitTime.Web.Models
 
             modelBuilder.Entity<Contact>()
                 .Map<Contact>(m => m.Requires("Subtype").HasValue("Contact"))
-                .Map<Company>(m => m.Requires("Subtype").HasValue(Constants.ContactTypes.Company))
-                .Map<Person>(m => m.Requires("Subtype").HasValue(Constants.ContactTypes.Person))
+                .Map<Company>(m => m.Requires("Subtype").HasValue(Constants.ContactType.Company))
+                .Map<Person>(m => m.Requires("Subtype").HasValue(Constants.ContactType.Person))
                 ;
+
+            modelBuilder.Entity<Person>()
+                .HasMany(p => p.Roles)
+                .WithMany(r => r.Persons)
+                .Map(t => t.MapLeftKey("fk_ContactID").MapRightKey("fk_RoleID").ToTable("ContactRole", "c"));
 
             base.OnModelCreating(modelBuilder);
         }
@@ -43,12 +48,13 @@ namespace GitTime.Web.Models
         public DbSet<Project> Projects { get; set; }
         public DbSet<Timecard> Timecards { get; set; }
         public DbSet<AccessToken> AccessTokens { get; set; }
+        public DbSet<Role> Roles { get; set; }
 
         #endregion
 
         #region Helper methods
 
-        public static void AddParameter(string name, SqlDbType dbType, object value, ICollection<SqlParameter> parameters)
+        public static void AddParameter(String name, SqlDbType dbType, Object value, ICollection<SqlParameter> parameters)
         {
             var param = new SqlParameter(name, dbType);
             param.Value = value != null ? value : DBNull.Value;
@@ -56,10 +62,10 @@ namespace GitTime.Web.Models
             parameters.Add(param);
         }
 
-        public static void AddParameterForLike(string name, object value, ICollection<SqlParameter> parameters)
+        public static void AddParameterForLike(String name, Object value, ICollection<SqlParameter> parameters)
         {
             var param = new SqlParameter(name, SqlDbType.NVarChar);
-            param.Value = value != null && !string.IsNullOrEmpty(value.ToString()) ? (object)string.Format("%{0}%", value) : DBNull.Value;
+            param.Value = value != null && !String.IsNullOrEmpty(value.ToString()) ? (Object)String.Format("%{0}%", value) : DBNull.Value;
 
             parameters.Add(param);
         }
@@ -70,12 +76,12 @@ namespace GitTime.Web.Models
         public static GitTimeContext GetContext<TEntity>(DbSet<TEntity> dbSet)
                 where TEntity : class
         {
-            object internalSet = dbSet
+            Object internalSet = dbSet
                 .GetType()
                 .GetField("_internalSet", BindingFlags.NonPublic | BindingFlags.Instance)
                 .GetValue(dbSet);
 
-            object internalContext = internalSet
+            Object internalContext = internalSet
                 .GetType()
                 .BaseType
                 .GetField("_internalContext", BindingFlags.NonPublic | BindingFlags.Instance)

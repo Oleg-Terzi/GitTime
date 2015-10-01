@@ -1,9 +1,11 @@
-﻿namespace GitTime.Web.Models.View.Project
+﻿using System;
+
+namespace GitTime.Web.Models.View.Project
 {
     public class SearchCriteriaModel
     {
-        public int? CompanyContactID { get; set; }
+        public Int32? CompanyContactID { get; set; }
 
-        public bool Clear { get; set; }
+        public Boolean Clear { get; set; }
     }
 }

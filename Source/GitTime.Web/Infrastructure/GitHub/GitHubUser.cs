@@ -82,14 +82,17 @@ namespace GitTime.Web.Infrastructure.GitHub
             using (var db = new GitTimeContext())
             {
                 var token = await db.AccessTokens.Where(t => t.ContactID == userId && t.Application == "GitHub").SingleOrDefaultAsync();
-                var userInfo = await GitHubHelper.RequestUserInfoAsync(token);
-                if (userInfo != null)
+                if (token != null)
                 {
-                    result.ID = userInfo.ID;
-                    result.Name = userInfo.LoginName;
-                    result.AvatarUrl = userInfo.AvatarUrl;
-                    result.IsAuthenticated = true;
-                    result.AccessToken = token;
+                    var userInfo = await GitHubHelper.RequestUserInfoAsync(token);
+                    if (userInfo != null)
+                    {
+                        result.ID = userInfo.ID;
+                        result.Name = userInfo.LoginName;
+                        result.AvatarUrl = userInfo.AvatarUrl;
+                        result.IsAuthenticated = true;
+                        result.AccessToken = token;
+                    }
                 }
             }
 

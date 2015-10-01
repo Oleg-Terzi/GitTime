@@ -22,8 +22,8 @@ namespace GitTime.Web
 
             ModelBinders.Binders.Add(typeof(DateTime), new DateTimeModelBinder());
             ModelBinders.Binders.Add(typeof(DateTime?), new DateTimeModelBinder());
-            ModelBinders.Binders.Add(typeof(decimal), new DecimalModelBinder());
-            ModelBinders.Binders.Add(typeof(decimal?), new DecimalModelBinder());
+            ModelBinders.Binders.Add(typeof(Decimal), new DecimalModelBinder());
+            ModelBinders.Binders.Add(typeof(Decimal?), new DecimalModelBinder());
         }
     }
 }

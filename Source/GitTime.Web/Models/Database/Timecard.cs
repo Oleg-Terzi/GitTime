@@ -11,21 +11,21 @@ namespace GitTime.Web.Models.Database
 
         [Key]
         [Column("pk_ID")]
-        public int ID { get; set; }
+        public Int32 ID { get; set; }
 
         [Column("fk_ProjectID")]
-        public int ProjectID { get; set; }
+        public Int32 ProjectID { get; set; }
 
         [Column("fk_PersonContactID")]
-        public int PersonContactID { get; set; }
+        public Int32 PersonContactID { get; set; }
 
-        public int? IssueNumber { get; set; }
+        public Int32? IssueNumber { get; set; }
 
-        public string IssueDescription { get; set; }
+        public String IssueDescription { get; set; }
 
         public DateTime EntryDate { get; set; }
 
-        public decimal Hours { get; set; }
+        public Decimal Hours { get; set; }
 
         #endregion
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Security.Principal;
@@ -23,6 +24,7 @@ namespace GitTime.Web.Infrastructure.Web
         public String Email { get; private set; }
         public String FirstName { get; private set; }
         public String LastName { get; private set; }
+        public HashSet<String> Roles { get; private set; }
 
         // IIdentity
 
@@ -58,6 +60,7 @@ namespace GitTime.Web.Infrastructure.Web
             Email = p.Email;
             FirstName = p.FirstName;
             LastName = p.LastName;
+            Roles = new HashSet<String>(p.Roles.Select(r => r.Name).ToArray());
             IsAuthenticated = true;
         }
 
@@ -67,7 +70,7 @@ namespace GitTime.Web.Infrastructure.Web
 
         public Boolean IsInRole(String roleName)
         {
-            return false;
+            return Roles.Contains(roleName);
         }
 
         #endregion
@@ -80,19 +83,16 @@ namespace GitTime.Web.Infrastructure.Web
 
             if (!String.IsNullOrEmpty(email))
             {
-                await Task.Run(() =>
+                using (var db = new GitTimeContext())
                 {
-                    using (var db = new GitTimeContext())
-                    {
-                        var contact = (
-                            db.Persons
-                                .Where(c => c.Email == email)
-                                .Select(c => c)
-                            ).AsNoTracking().FirstOrDefault();
+                    var contact = await (
+                        db.Persons
+                            .Where(c => c.Email == email)
+                            .Select(c => c)
+                        ).AsNoTracking().FirstOrDefaultAsync();
 
-                        user = new GitTimeUser(contact);
-                    }
-                });
+                    user = new GitTimeUser(contact);
+                }
             }
 
             return user ?? new GitTimeUser(null);

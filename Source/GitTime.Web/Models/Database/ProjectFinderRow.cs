@@ -1,10 +1,12 @@
-﻿namespace GitTime.Web.Models.Database
+﻿using System;
+
+namespace GitTime.Web.Models.Database
 {
     public class ProjectFinderRow
     {
-        public int ProjectID { get; set; }
-        public string CompanyName { get; set; }
-        public string ProjectName { get; set; }
-        public string Repository { get; set; }
+        public Int32 ProjectID { get; set; }
+        public String CompanyName { get; set; }
+        public String ProjectName { get; set; }
+        public String Repository { get; set; }
     }
 }

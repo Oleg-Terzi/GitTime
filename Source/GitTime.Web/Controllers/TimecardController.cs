@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Data.Entity;
 using System.Linq;
-
+using System.Security.Principal;
+using System.Threading.Tasks;
+using GitTime.Web;
+using GitTime.Web.Infrastructure.Web;
 using GitTime.Web.Models;
 using GitTime.Web.Models.Database;
 using GitTime.Web.Models.View;
@@ -11,14 +14,23 @@ namespace GitTime.Web.Controllers
 {
     public class TimecardController : BaseFinderController<FinderModel, TimecardFilter>
     {
+        #region Security
+
+        protected override Boolean CanView(IPrincipal principal)
+        {
+            return principal.IsInRole(Constants.RoleType.Administrator) || principal.IsInRole(Constants.RoleType.Developer);
+        }
+
+        #endregion
+
         #region Properties
 
-        protected override string SingleEntityName
+        protected override String SingleEntityName
         {
             get { return "Timecard"; }
         }
 
-        protected override string MultiEntityName
+        protected override String MultiEntityName
         {
             get { return "Timecards"; }
         }
@@ -26,7 +38,7 @@ namespace GitTime.Web.Controllers
         #endregion
 
         #region Initialization
-        
+
         protected override TimecardFilter GetInitFilter()
         {
             return new TimecardFilter();
@@ -63,23 +75,23 @@ namespace GitTime.Web.Controllers
             };
         }
 
-        protected override void InitCreate(FinderModel model)
+        protected override async Task InitCreate(FinderModel model)
         {
-            model.Edit = new EditorModel() { EntryDate = DateTime.Now };
+            model.Edit = new EditorModel { EntryDate = DateTime.Now };
 
             using (var db = new GitTimeContext())
             {
-                model.Edit.PersonContactID = db.Persons
+                model.Edit.PersonContactID = await db.Persons
                     .Where(p => p.Email == User.Identity.Name)
-                    .Select(p => p.ID).First();
+                    .Select(p => p.ID).FirstAsync();
             }
         }
 
-        protected override void InitEdit(FinderModel model)
+        protected override async Task InitEdit(FinderModel model)
         {
             using (var db = new GitTimeContext())
             {
-                model.Edit = db.Timecards
+                model.Edit = await db.Timecards
                     .Where(p => p.ID == model.Key.Value)
                     .Select(p => new EditorModel
                     {
@@ -90,39 +102,38 @@ namespace GitTime.Web.Controllers
                         IssueNumber = p.IssueNumber,
                         IssueDescription = p.IssueDescription,
                         Hours = p.Hours
-                    }).First();
+                    }).FirstAsync();
             }
         }
 
         #endregion
 
-
         #region Database methods
 
-        protected override int Count(TimecardFilter filter)
+        protected override async Task<Int32> Count(TimecardFilter filter)
         {
             using (var db = new GitTimeContext())
             {
-                ViewBag.SumHours = db.Timecards.SumHours(filter);
+                ViewBag.SumHours = await db.Timecards.SumHoursAsync(filter);
 
-                return db.Timecards.Count(filter);
+                return await db.Timecards.CountAsync(filter);
             }
         }
 
-        protected override object Select(int startRow, int endRow, TimecardFilter filter)
+        protected override async Task<Object> Select(Int32 startRow, Int32 endRow, TimecardFilter filter)
         {
             using (var db = new GitTimeContext())
-                return db.Timecards.SelectFinderRows(startRow, endRow, filter, null);
+                return await db.Timecards.SelectFinderRowsAsync(startRow, endRow, filter, null);
         }
 
-        protected override SaveResult SaveData(FinderModel model)
+        protected override async Task<SaveResult> SaveData(FinderModel model)
         {
             EditorModel editorModel = model.Edit;
 
             using (var db = new GitTimeContext())
             {
                 Timecard row = editorModel.ID.HasValue
-                    ? db.Timecards.Find(editorModel.ID.Value)
+                    ? await db.Timecards.FindAsync(editorModel.ID.Value)
                     : new Timecard();
 
                 if (row == null)
@@ -143,18 +154,16 @@ namespace GitTime.Web.Controllers
                 else
                     db.Timecards.Add(row);
 
-                db.SaveChanges();
+                await db.SaveChangesAsync();
             }
 
-            return editorModel.ID.HasValue ? SaveResult.Edited: SaveResult.Added;
+            return editorModel.ID.HasValue ? SaveResult.Edited : SaveResult.Added;
         }
 
-        protected override void DeleteData(FinderModel model)
+        protected override async Task DeleteData(FinderModel model)
         {
-            using (GitTimeContext db = new GitTimeContext())
-            {
-                db.Timecards.Delete(model.Key.Value);
-            }
+            using (var db = new GitTimeContext())
+                await db.Timecards.DeleteAsync(model.Key.Value);
         }
 
         #endregion

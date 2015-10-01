@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Data.Entity;
 using System.Linq;
+using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
+
 using GitTime.Web.Infrastructure.GitHub;
 using GitTime.Web.Infrastructure.Helpers;
 using GitTime.Web.Infrastructure.Web;
@@ -56,7 +58,7 @@ namespace GitTime.Web.Controllers
             using (var db = new GitTimeContext())
             {
                 var user = await GetUser(db, model.Email);
-                if (user == null || !string.Equals(model.Password, user.Password))
+                if (user == null || !String.Equals(model.Password, user.Password))
                     return Error(model, "Incorrect email or password.");
             }
 

@@ -1,6 +1,9 @@
-﻿using System.Data.Entity;
+﻿using System;
+using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
-
+using System.Security.Principal;
+using System.Threading.Tasks;
 using GitTime.Web.Models;
 using GitTime.Web.Models.Database;
 using GitTime.Web.Models.View;
@@ -10,14 +13,23 @@ namespace GitTime.Web.Controllers
 {
     public class PersonController : BaseFinderController<FinderModel, ContactFilter>
     {
+        #region Security
+
+        protected override Boolean CanView(IPrincipal principal)
+        {
+            return principal.IsInRole(Constants.RoleType.Administrator);
+        }
+
+        #endregion
+
         #region Properties
 
-        protected override string SingleEntityName
+        protected override String SingleEntityName
         {
             get { return "Person"; }
         }
 
-        protected override string MultiEntityName
+        protected override String MultiEntityName
         {
             get { return "Persons"; }
         }
@@ -56,25 +68,35 @@ namespace GitTime.Web.Controllers
             };
         }
 
-        protected override void InitCreate(FinderModel model)
+        protected override async Task InitCreate(FinderModel model)
         {
             model.Edit = new EditorModel();
+
+            using (var db = new GitTimeContext())
+            {
+                ViewBag.Roles = await db.Roles.ToListAsync();
+            }
         }
 
-        protected override void InitEdit(FinderModel model)
+        protected override async Task InitEdit(FinderModel model)
         {
             using (var db = new GitTimeContext())
             {
-                model.Edit = db.Persons
+                var entity = await db.Persons
                     .Where(p => p.ID == model.Key.Value)
-                    .Select(p => new EditorModel
-                    {
-                        ID = p.ID,
-                        Email = p.Email,
-                        FirstName = p.FirstName,
-                        LastName = p.LastName,
-                        Password = p.Password
-                    }).First();
+                    .FirstAsync();
+
+                model.Edit = new EditorModel
+                {
+                    ID = entity.ID,
+                    Email = entity.Email,
+                    FirstName = entity.FirstName,
+                    LastName = entity.LastName,
+                    Password = entity.Password,
+                    Roles = entity.Roles.Select(r => r.ID).ToList(),
+                };
+
+                ViewBag.Roles = await db.Roles.ToListAsync();
             }
         }
 
@@ -83,37 +105,38 @@ namespace GitTime.Web.Controllers
 
         #region Database methods
 
-        protected override int Count(ContactFilter filter)
+        protected override async Task<Int32> Count(ContactFilter filter)
         {
-            filter.Subtype = Constants.ContactTypes.Person;
+            filter.Subtype = Constants.ContactType.Person;
 
             using (var db = new GitTimeContext())
             {
-                return db.Contacts.Count(filter);
+                return await db.Contacts.CountAsync(filter);
             }
         }
 
-        protected override object Select(int startRow, int endRow, ContactFilter filter)
+        protected override async Task<Object> Select(Int32 startRow, Int32 endRow, ContactFilter filter)
         {
-            filter.Subtype = Constants.ContactTypes.Person;
+            filter.Subtype = Constants.ContactType.Person;
 
             using (var db = new GitTimeContext())
-                return db.Contacts.SelectFinderRows(startRow, endRow, filter, "FirstName, LastName");
+                return await db.Contacts.SelectFinderRowsAsync(startRow, endRow, filter, "FirstName, LastName");
         }
 
-        protected override SaveResult SaveData(FinderModel model)
+        protected override async Task<SaveResult> SaveData(FinderModel model)
         {
             EditorModel editorModel = model.Edit;
 
             using (var db = new GitTimeContext())
             {
-                Person row = editorModel.ID.HasValue
-                    ? db.Persons.Find(editorModel.ID.Value)
+                var row = editorModel.ID.HasValue
+                    ? await db.Persons.FindAsync(editorModel.ID.Value)
                     : new Person();
 
                 if (row == null)
                 {
                     ViewBag.ErrorMessage = "This person record doesn't exist anymore. Please create new one.";
+
                     return SaveResult.NotSaved;
                 }
 
@@ -122,22 +145,26 @@ namespace GitTime.Web.Controllers
                 row.LastName = editorModel.LastName;
                 row.Password = editorModel.Password;
 
+                row.Roles.Clear();
+                foreach (var r in db.Roles.Where(r => editorModel.Roles.Contains(r.ID)))
+                    row.Roles.Add(r);
+
                 if (editorModel.ID.HasValue)
                     db.Entry(row).State = EntityState.Modified;
                 else
                     db.Persons.Add(row);
 
-                db.SaveChanges();
+                await db.SaveChangesAsync();
             }
 
             return editorModel.ID.HasValue ? SaveResult.Edited : SaveResult.Added;
         }
 
-        protected override void DeleteData(FinderModel model)
+        protected override async Task DeleteData(FinderModel model)
         {
-            using (GitTimeContext db = new GitTimeContext())
+            using (var db = new GitTimeContext())
             {
-                db.Contacts.Delete(model.Key.Value);
+                await db.Contacts.DeleteAsync(model.Key.Value);
             }
         }
 

@@ -1,8 +1,10 @@
-﻿namespace GitTime.Web.Models.View
+﻿using System;
+
+namespace GitTime.Web.Models.View
 {
     public class BaseSearchResultsModel
     {
-        public string SerializedFilter { get; set; }
-        public int PageIndex { get; set; }
+        public String SerializedFilter { get; set; }
+        public Int32 PageIndex { get; set; }
     }
 }
