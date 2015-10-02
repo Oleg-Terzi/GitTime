@@ -133,8 +133,14 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Infrastructure\AppSettings.cs" />
+    <Compile Include="Infrastructure\GitHub\Data\GitHubContext.cs" />
+    <Compile Include="Infrastructure\GitHub\Data\GitHubIssueInfo.cs" />
+    <Compile Include="Infrastructure\GitHub\Data\GitHubIssueStateType.cs" />
+    <Compile Include="Infrastructure\GitHub\Data\GitHubLabelInfo.cs" />
+    <Compile Include="Infrastructure\GitHub\Data\GitHubRepositoryInfo.cs" />
     <Compile Include="Infrastructure\GitHub\Data\GitHubUserEmailInfo.cs" />
     <Compile Include="Infrastructure\GitHub\Data\GitHubUserInfo.cs" />
+    <Compile Include="Infrastructure\GitHub\Data\GitHubUserType.cs" />
     <Compile Include="Infrastructure\GitHub\GitHubUser.cs" />
     <Compile Include="Infrastructure\Helpers\AppSettingsHelper.cs" />
     <Compile Include="Infrastructure\Helpers\CultureHelper.cs" />
@@ -298,10 +304,10 @@
     <Content Include="Views\Project\SearchResults.cshtml" />
     <Content Include="Views\Project\Edit.cshtml" />
     <Content Include="Views\Shared\_AccessDenied.cshtml" />
+    <Content Include="Views\Issue\Find.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Views\Issue\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />

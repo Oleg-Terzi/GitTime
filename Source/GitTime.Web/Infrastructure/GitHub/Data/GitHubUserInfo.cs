@@ -7,22 +7,14 @@ namespace GitTime.Web.Infrastructure.GitHub.Data
 {
     public class GitHubUserInfo
     {
+        #region Simple properties
+
         public Int32 ID { get; set; }
         public String LoginName { get; set; }
         public String AvatarUrl { get; set; }
         public String GravatarId { get; set; }
-        public String ApiUrl { get; set; }
-        public String HtmlUrl { get; set; }
-        public String ApiFollowersUrl { get; set; }
-        public String ApiFollowingUrl { get; set; }
-        public String ApiGistsUrl { get; set; }
-        public String ApiStarredUrl { get; set; }
-        public String ApiSubscriptionsUrl { get; set; }
-        public String ApiOrganizationsUrl { get; set; }
-        public String ApiReposUrl { get; set; }
-        public String ApiEventsUrl { get; set; }
-        public String ApiReceivedEventsUrl { get; set; }
-        public String AccountType { get; set; }
+        public String ProfileUrl { get; set; }
+        public GitHubUserType AccountType { get; set; }
         public Boolean IsSiteAdmin { get; set; }
         public String Name { get; set; }
         public String Company { get; set; }
@@ -37,5 +29,16 @@ namespace GitTime.Web.Infrastructure.GitHub.Data
         public Int32 FollowingCount { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime? UpdatedOn { get; set; }
+
+        #endregion
+
+        #region Overriden methods
+
+        public override String ToString()
+        {
+            return LoginName ?? base.ToString();
+        }
+
+        #endregion
     }
 }
