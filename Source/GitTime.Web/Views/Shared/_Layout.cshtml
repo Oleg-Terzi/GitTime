@@ -18,10 +18,16 @@
 
     if (isDeveloper || isAdministrator)
     {
-        userMenu.Add(new List<MvcHtmlString>(new[] {
-            Html.ActionLink("Issues", "Find", "Issue"),
-            Html.ActionLink("Timecards", "Find", "Timecard")
-        }));
+        var devMenuItems = new List<MvcHtmlString>();
+        
+        if (gitHubUser.IsAuthenticated)
+        {
+            devMenuItems.Add(Html.ActionLink("Issues", "Find", "Issue"));
+        }
+        
+        devMenuItems.Add(Html.ActionLink("Timecards", "Find", "Timecard"));
+        
+        userMenu.Add(devMenuItems);
     }
 
     if (isAdministrator)

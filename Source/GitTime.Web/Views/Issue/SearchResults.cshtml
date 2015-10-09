@@ -1,0 +1,55 @@
+﻿@using GitTime.Web.Infrastructure.GitHub.Data
+@using GitTime.Web.Models.View.Issue
+
+@model FinderModel
+
+@{
+    var _dataSource = (ICollection<GitHubIssueInfo>)ViewBag.DataSource;
+}
+
+@Html.Partial("_SearchResultsHeader")
+
+<p>
+    <div id="EditorPlaceholder"></div>
+</p>
+
+@if (_dataSource.Count > 0)
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Number</th>
+                <th>Repository</th>
+                <th>Summary</th>
+                <th>Opened</th>
+                <th>Assigned</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (GitHubIssueInfo row in _dataSource)
+            {
+                <tr>
+                    <td>
+                        <a href="javascript:void(0);" title="View">#@String.Format("{0:0000}", row.Number)</a> @(
+                            row.Labels.FirstOrDefault(l => String.Compare(l.Name, "urgent") == 0) != null
+                                ? Html.Raw("<span style='color:#ff0000;'>&#9650;</span>")
+                                : row.Labels.FirstOrDefault(l => String.Compare(l.Name, "nonessential") == 0) != null
+                                    ? Html.Raw("<span style='color:#009000;'>&#9660</span>")
+                                    : Html.Raw("<span style='color:#fff;'>&#9899;</span>")
+                        )
+                    </td>
+                    <td>@row.Repository.Name</td>
+                    <td>@row.Title</td>
+                    <td>@(row.User != null ? row.User.LoginName : String.Empty)</td>
+                    <td>@(row.Assignee != null ? row.Assignee.LoginName : String.Empty)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    @Html.Partial("_SearchResultsPager")
+}
+else
+{
+    <strong>There are currently no issues assigned to you.</strong>
+}

@@ -38,15 +38,15 @@ namespace GitTime.Web.Controllers
 
         #region Initialization
 
-        protected override ProjectFilter GetInitFilter()
+        protected override async Task<ProjectFilter> GetInitFilter()
         {
             return new ProjectFilter();
         }
 
-        protected override ProjectFilter GetFilterBySearchCriteria(FinderModel model)
+        protected override async Task<ProjectFilter> GetFilterBySearchCriteria(FinderModel model)
         {
             return model.SearchCriteria.Clear
-                ? GetInitFilter()
+                ? await GetInitFilter()
                 : new ProjectFilter
                     {
                         CompanyContactID = model.SearchCriteria.CompanyContactID

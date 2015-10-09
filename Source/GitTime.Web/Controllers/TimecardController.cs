@@ -39,15 +39,15 @@ namespace GitTime.Web.Controllers
 
         #region Initialization
 
-        protected override TimecardFilter GetInitFilter()
+        protected override async Task<TimecardFilter> GetInitFilter()
         {
             return new TimecardFilter();
         }
 
-        protected override TimecardFilter GetFilterBySearchCriteria(FinderModel model)
+        protected override async Task<TimecardFilter> GetFilterBySearchCriteria(FinderModel model)
         {
             return model.SearchCriteria.Clear
-                ? GetInitFilter()
+                ? await GetInitFilter()
                 : new TimecardFilter
                     {
                         ProjectID = model.SearchCriteria.ProjectID,

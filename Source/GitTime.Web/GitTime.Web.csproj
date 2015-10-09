@@ -184,6 +184,10 @@
     <Compile Include="Models\View\Company\EditorModel.cs" />
     <Compile Include="Models\View\Company\FinderModel.cs" />
     <Compile Include="Models\View\Company\SearchCriteriaModel.cs" />
+    <Compile Include="Models\View\Issue\EditorModel.cs" />
+    <Compile Include="Models\View\Issue\FinderModel.cs" />
+    <Compile Include="Infrastructure\GitHub\Data\GitHubIssueFilter.cs" />
+    <Compile Include="Models\View\Issue\SearchCriteriaModel.cs" />
     <Compile Include="Models\View\LoginModel.cs" />
     <Compile Include="Models\View\Person\EditorModel.cs" />
     <Compile Include="Models\View\Person\FinderModel.cs" />
@@ -305,6 +309,8 @@
     <Content Include="Views\Project\Edit.cshtml" />
     <Content Include="Views\Shared\_AccessDenied.cshtml" />
     <Content Include="Views\Issue\Find.cshtml" />
+    <Content Include="Views\Issue\SearchResults.cshtml" />
+    <Content Include="Views\Issue\View.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

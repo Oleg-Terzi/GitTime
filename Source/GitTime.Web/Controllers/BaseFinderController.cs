@@ -29,7 +29,7 @@ namespace GitTime.Web.Controllers
 
         public async Task<ActionResult> Find()
         {
-            var filter = GetInitFilter();
+            var filter = await GetInitFilter();
             var model = new ModelType();
 
             var searchResults = new BaseSearchResultsModel
@@ -48,7 +48,7 @@ namespace GitTime.Web.Controllers
         [HttpPost]
         public async Task<ActionResult> Search(ModelType model)
         {
-            FilterType filter = GetFilterBySearchCriteria(model);
+            FilterType filter = await GetFilterBySearchCriteria(model);
 
             var searchResults = new BaseSearchResultsModel
             {
@@ -133,8 +133,8 @@ namespace GitTime.Web.Controllers
 
         #region Initialization
 
-        protected abstract FilterType GetInitFilter();
-        protected abstract FilterType GetFilterBySearchCriteria(ModelType model);
+        protected abstract Task<FilterType> GetInitFilter();
+        protected abstract Task<FilterType> GetFilterBySearchCriteria(ModelType model);
         protected abstract BaseSearchResultsModel GetSearchResults(ModelType model);
 
         protected abstract void InitModel(ModelType model, BaseSearchResultsModel searchResults, FilterType filter);
@@ -153,6 +153,8 @@ namespace GitTime.Web.Controllers
 
         private async Task LoadData(BaseSearchResultsModel searchResults, FilterType filter)
         {
+            await OnBeforeLoadData(filter);
+
             Int32 startRow, endRow, rowCount, pageCount;
 
             rowCount = await Count(filter);
@@ -180,6 +182,11 @@ namespace GitTime.Web.Controllers
             ViewBag.RowCount = rowCount;
             ViewBag.PageIndex = searchResults.PageIndex;
             ViewBag.PageCount = pageCount;
+        }
+
+        protected virtual async Task OnBeforeLoadData(FilterType filter)
+        {
+
         }
 
         #endregion

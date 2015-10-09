@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Security.Principal;
 using System.Threading.Tasks;
+
 using GitTime.Web.Models;
 using GitTime.Web.Models.Database;
 using GitTime.Web.Models.View;
@@ -38,15 +38,15 @@ namespace GitTime.Web.Controllers
 
         #region Initialization
 
-        protected override ContactFilter GetInitFilter()
+        protected override async Task<ContactFilter> GetInitFilter()
         {
             return new ContactFilter();
         }
 
-        protected override ContactFilter GetFilterBySearchCriteria(FinderModel model)
+        protected override async Task<ContactFilter> GetFilterBySearchCriteria(FinderModel model)
         {
             return model.SearchCriteria.Clear
-                ? GetInitFilter()
+                ? await GetInitFilter()
                 : new ContactFilter
                     {
                         PersonName = model.SearchCriteria.PersonName
