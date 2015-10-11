@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 
 namespace GitTime.Web.Infrastructure.GitHub.Data
 {
@@ -9,5 +6,8 @@ namespace GitTime.Web.Infrastructure.GitHub.Data
     public class GitHubIssueFilter
     {
         public Int32? AssigneeID { get; set; }
+        public String RepositoryName { get; set; }
+        public String[] AvailableRepositories { get; set; }
+        public GitHubIssueStateType? State { get; set; }
     }
 }

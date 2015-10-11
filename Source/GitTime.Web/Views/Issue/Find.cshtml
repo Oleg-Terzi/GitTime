@@ -21,7 +21,11 @@
                     @using (Html.BeginForm(null, null, null, FormMethod.Post, new { role = "form" }))
                     {
                         <div class="form-group">
-                            @*@Html.InputTextWithoutValidationFor(x => x.SearchCriteria.PersonName, new { placeholder = "Person Name", @class = "form-control input-sm" })*@
+                            @Html.ProjectRepositorySelectorFor(x => x.SearchCriteria.RepositoryName, new { @class = "form-control input-sm" }, false)
+                        </div>
+                        
+                        <div class="form-group">
+                            @Html.DropDownListFor(x => x.SearchCriteria.StatusName, new SelectList(new String[] { "Open", "Closed" }), "Issue Status...", new { @class = "form-control input-sm" })
                         </div>
 
                         <div class="form-group buttons">
@@ -43,3 +47,25 @@
 
 <div class="loading-modal">
 </div>
+
+<script type="text/javascript">
+        
+    var issueController = {
+        showViewer: function (id) {
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("ViewIssue")',
+                data: { id: id },
+                success: function (data) {
+                    _finder._init(data);
+                },
+                error: function (xhr) {
+                    var newDoc = document.open("text/html", "replace");
+                    newDoc.write(xhr.responseText);
+                    newDoc.close();
+                },
+            });
+        },
+    };
+
+</script>

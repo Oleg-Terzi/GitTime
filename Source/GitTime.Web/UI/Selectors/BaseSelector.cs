@@ -53,6 +53,7 @@ namespace GitTime.Web.UI.Selectors
             {
                 var empty = new TagBuilder("option");
                 empty.InnerHtml = emptyMessage;
+                empty.Attributes["value"] = "";
 
                 options.Append(empty.ToString(TagRenderMode.Normal));
             }

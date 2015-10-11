@@ -38,7 +38,7 @@ namespace GitTime.Web.Controllers
                 SerializedFilter = SerializeFilter(filter)
             };
 
-            InitModel(model, searchResults, filter);
+            await InitModel(model, searchResults, filter);
 
             await LoadData(searchResults, filter);
 
@@ -56,7 +56,7 @@ namespace GitTime.Web.Controllers
                 SerializedFilter = SerializeFilter(filter)
             };
 
-            InitModel(model, searchResults, filter);
+            await InitModel(model, searchResults, filter);
 
             await LoadData(searchResults, filter);
 
@@ -137,7 +137,7 @@ namespace GitTime.Web.Controllers
         protected abstract Task<FilterType> GetFilterBySearchCriteria(ModelType model);
         protected abstract BaseSearchResultsModel GetSearchResults(ModelType model);
 
-        protected abstract void InitModel(ModelType model, BaseSearchResultsModel searchResults, FilterType filter);
+        protected abstract Task InitModel(ModelType model, BaseSearchResultsModel searchResults, FilterType filter);
         protected abstract Task InitCreate(ModelType model);
         protected abstract Task InitEdit(ModelType model);
 

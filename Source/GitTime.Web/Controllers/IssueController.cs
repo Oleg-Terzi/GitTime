@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Principal;
+using System.Data.Entity;
 using System.Threading.Tasks;
 using System.Web;
-
+using System.Web.Mvc;
 using GitTime.Web.Infrastructure.GitHub;
 using GitTime.Web.Infrastructure.GitHub.Data;
+using GitTime.Web.Infrastructure.Text;
+using GitTime.Web.Models;
 using GitTime.Web.Models.View;
 using GitTime.Web.Models.View.Issue;
 
@@ -55,16 +58,19 @@ namespace GitTime.Web.Controllers
 
         protected override async Task<GitHubIssueFilter> GetInitFilter()
         {
-            var user = await GitHubUser.GetCurrentAsync();
-
-            return new GitHubIssueFilter { AssigneeID = user.ID };
+            return new GitHubIssueFilter { State = GitHubIssueStateType.Open };
         }
 
         protected override async Task<GitHubIssueFilter> GetFilterBySearchCriteria(FinderModel model)
         {
             return model.SearchCriteria.Clear
                 ? await GetInitFilter()
-                : new GitHubIssueFilter { AssigneeID = model.SearchCriteria.AssigneeID };
+                : new GitHubIssueFilter { 
+                    RepositoryName = model.SearchCriteria.RepositoryName,
+                    State = !String.IsNullOrEmpty(model.SearchCriteria.StatusName)
+                        ? (GitHubIssueStateType?)Enum.Parse(typeof(GitHubIssueStateType), model.SearchCriteria.StatusName)
+                        : null
+                };
         }
 
         protected override BaseSearchResultsModel GetSearchResults(FinderModel model)
@@ -72,46 +78,23 @@ namespace GitTime.Web.Controllers
             return model.SearchResults;
         }
 
-        protected override void InitModel(FinderModel model, BaseSearchResultsModel searchResults, GitHubIssueFilter filter)
+        protected override async Task InitModel(FinderModel model, BaseSearchResultsModel searchResults, GitHubIssueFilter filter)
         {
             model.SearchResults = searchResults;
-
-            model.SearchCriteria = new SearchCriteriaModel
-            {
-                AssigneeID = filter.AssigneeID
+            model.SearchCriteria = new SearchCriteriaModel { 
+                RepositoryName = filter.RepositoryName,
+                StatusName = filter.State.HasValue ? Enum.GetName(typeof(GitHubIssueStateType), filter.State.Value) : null,
             };
         }
 
         protected override async Task InitCreate(FinderModel model)
         {
-            model.Edit = new EditorModel();
-
-            //using (var db = new GitTimeContext())
-            //{
-            //    ViewBag.Roles = await db.Roles.ToListAsync();
-            //}
+            throw new NotImplementedException();
         }
 
         protected override async Task InitEdit(FinderModel model)
         {
-            //using (var db = new GitTimeContext())
-            //{
-            //    var entity = await db.Persons
-            //        .Where(p => p.ID == model.Key.Value)
-            //        .FirstAsync();
-
-            //    model.Edit = new EditorModel
-            //    {
-            //        ID = entity.ID,
-            //        Email = entity.Email,
-            //        FirstName = entity.FirstName,
-            //        LastName = entity.LastName,
-            //        Password = entity.Password,
-            //        Roles = entity.Roles.Select(r => r.ID).ToList(),
-            //    };
-
-            //    ViewBag.Roles = await db.Roles.ToListAsync();
-            //}
+            throw new NotImplementedException();
         }
 
         #endregion
@@ -120,6 +103,20 @@ namespace GitTime.Web.Controllers
 
         protected override async Task OnBeforeLoadData(GitHubIssueFilter filter)
         {
+            if (filter.AvailableRepositories == null)
+            {
+                using (var db = new GitTimeContext())
+                {
+                    filter.AvailableRepositories = await db.Projects.Select(p => p.Repository).ToArrayAsync();
+                }
+            }
+
+            if (!filter.AssigneeID.HasValue)
+            {
+                var user = await GitHubUser.GetCurrentAsync();
+                filter.AssigneeID = user.ID;
+            }
+
             var context = await GetContext(Session);
 
             _data = context.Issues.Select(i => i.Value).Where(i => IsMatchFilter(filter, i)).OrderBy(i => i.Number).ToList();
@@ -127,10 +124,12 @@ namespace GitTime.Web.Controllers
 
         private static Boolean IsMatchFilter(GitHubIssueFilter filter, GitHubIssueInfo info)
         {
-            return true;
-            //return filter == null || (
-            //    (!filter.AssigneeID.HasValue || (info.Assignee != null && info.Assignee.ID == filter.AssigneeID.Value))
-            //);
+            return filter == null || (
+                (filter.AvailableRepositories != null && filter.AvailableRepositories.Length > 0 && filter.AvailableRepositories.Contains(info.Repository.FullName))
+                && (String.IsNullOrEmpty(filter.RepositoryName) || info.Repository.FullName == filter.RepositoryName)
+                && (filter.State == null || info.State == filter.State)
+                // && (!filter.AssigneeID.HasValue || (info.Assignee != null && info.Assignee.ID == filter.AssigneeID.Value))
+            );
         }
 
         protected override async Task<Int32> Count(GitHubIssueFilter filter)
@@ -202,6 +201,26 @@ namespace GitTime.Web.Controllers
             //{
             //    await db.Contacts.DeleteAsync(model.Key.Value);
             //}
+        }
+
+        #endregion
+
+        #region Views
+
+        [HttpPost]
+        public async Task<ActionResult> ViewIssue(Int32 id)
+        {
+            var context = await GetContext(Session);
+            var issue = context.Issues[id];
+
+            var model = new ViewerModel
+            {
+                Number = issue.Number,
+                Title = issue.Title,
+                BodyHtml = new Markdown().Transform(issue.BodyText)
+            };
+
+            return PartialView("View", model);
         }
 
         #endregion

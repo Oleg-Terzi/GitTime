@@ -26,6 +26,20 @@ namespace GitTime.Web.UI.Selectors
             return BaseSelector.GetSelector(htmlHelper, expression, htmlAttributes, validate, true, "Select a Project...", dataSource);
         }
 
+        public static MvcHtmlString ProjectRepositorySelectorFor<TModel, TProperty>(this HtmlHelper<TModel> htmlHelper, Expression<Func<TModel, TProperty>> expression, Object htmlAttributes = null, Boolean validate = true)
+        {
+            IEnumerable<DataItem> dataSource;
+
+            using (var db = new GitTimeContext())
+            {
+                dataSource = db.Projects
+                    .OrderBy(c => c.Name)
+                    .Select(c => new DataItem { Text = c.Name, Value = c.Repository }).ToList();
+            }
+
+            return BaseSelector.GetSelector(htmlHelper, expression, htmlAttributes, validate, true, "Select a Project...", dataSource);
+        }
+
         #endregion
     }
 }

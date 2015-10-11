@@ -1,7 +1,37 @@
-﻿
-@{
-    ViewBag.Title = "View";
-}
+﻿@using GitTime.Web.Models.View.Issue
 
-<h2>View</h2>
+@model ViewerModel
 
+<!-- Modal -->
+<div class="modal fade" id="Editor" tabindex="-1" role="dialog" aria-labelledby="EditorTitle" data-backdrop="false" data-keyboard="false">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="EditorTitle">@String.Format("Issue #{0:0000}", Model.Number)</h4>
+            </div>
+            <div class="modal-body">
+                <ul class="nav nav-tabs">
+                    <li class="active"><a data-toggle="tab" href="#issue_viewer_info">Details</a></li>
+                    <li><a data-toggle="tab" href="#issue_viewer_comments">Comments</a></li>
+                    <li><a data-toggle="tab" href="#issue_viewer_hours">Hours</a></li>
+                </ul>
+                <div class="tab-content" style="padding:16px 8px;">
+                    <div id="issue_viewer_info" class="tab-pane fade in active">
+                        <h4>@Model.Title</h4>
+                        @Html.Raw(Model.BodyHtml)
+                    </div>
+                    <div id="issue_viewer_comments" class="tab-pane fade">
+                        <h4>Comments</h4>
+                    </div>
+                    <div id="issue_viewer_hours" class="tab-pane fade">
+                        <h4>Hours</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

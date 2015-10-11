@@ -58,7 +58,7 @@ namespace GitTime.Web.Controllers
             return model.SearchResults;
         }
 
-        protected override void InitModel(FinderModel model, BaseSearchResultsModel searchResults, ContactFilter filter)
+        protected override async Task InitModel(FinderModel model, BaseSearchResultsModel searchResults, ContactFilter filter)
         {
             model.SearchResults = searchResults;
 

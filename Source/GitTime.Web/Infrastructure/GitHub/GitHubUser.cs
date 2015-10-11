@@ -21,6 +21,7 @@ namespace GitTime.Web.Infrastructure.GitHub
 
         public Int32 ID { get; private set; }
         public String Name { get; private set; }
+        public String Email { get; private set; }
         public String AvatarUrl { get; private set; }
         public Boolean IsAuthenticated { get; private set; }
 
@@ -89,6 +90,7 @@ namespace GitTime.Web.Infrastructure.GitHub
                     {
                         result.ID = userInfo.ID;
                         result.Name = userInfo.LoginName;
+                        result.Email = userInfo.Email;
                         result.AvatarUrl = userInfo.AvatarUrl;
                         result.IsAuthenticated = true;
                         result.AccessToken = token;

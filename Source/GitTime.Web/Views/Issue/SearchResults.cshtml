@@ -22,7 +22,9 @@
                 <th>Repository</th>
                 <th>Summary</th>
                 <th>Opened</th>
-                <th>Assigned</th>
+                <th>Closed</th>
+                <th style="text-align:right;">Hours</th>
+                <th style="width:13px;"></th>
             </tr>
         </thead>
         <tbody>
@@ -30,18 +32,27 @@
             {
                 <tr>
                     <td>
-                        <a href="javascript:void(0);" title="View">#@String.Format("{0:0000}", row.Number)</a> @(
+                        <a href="javascript:issueController.showViewer(@row.ID);" title="View">#@String.Format("{0:0000}", row.Number)</a> @(
                             row.Labels.FirstOrDefault(l => String.Compare(l.Name, "urgent") == 0) != null
-                                ? Html.Raw("<span style='color:#ff0000;'>&#9650;</span>")
+                                ? Html.Raw("<span style='color:#ff0000; cursor:default;' title='Urgent Priority' class='glyphicon glyphicon-exclamation-sign' aria-hidden='true'></span>")
                                 : row.Labels.FirstOrDefault(l => String.Compare(l.Name, "nonessential") == 0) != null
-                                    ? Html.Raw("<span style='color:#009000;'>&#9660</span>")
-                                    : Html.Raw("<span style='color:#fff;'>&#9899;</span>")
+                                    ? Html.Raw("<span style='color:#009000; cursor:default;' title='Low Priority' class='glyphicon glyphicon-arrow-down' aria-hidden='true'></span>")
+                                    : null
                         )
                     </td>
                     <td>@row.Repository.Name</td>
                     <td>@row.Title</td>
-                    <td>@(row.User != null ? row.User.LoginName : String.Empty)</td>
-                    <td>@(row.Assignee != null ? row.Assignee.LoginName : String.Empty)</td>
+                    <td>
+                        @(row.User != null ? Html.Raw(String.Format("<img alt='{0}' title='{0}' src='{1}' style='width:16px; height:16px;'>", row.User.LoginName, row.User.AvatarUrl)) : null)
+                        @String.Format("{0:MMM d, yyyy}", row.CreatedOn)
+                    </td>
+                    <td>@(row.ClosedOn.HasValue ? String.Format("{0:MMM d, yyyy} at {0:hh:mm tt}", row.ClosedOn) : null)</td>
+                    <td style="text-align:right;">0.0</td>
+                    <td>
+                        <a href="javascript:_finder.showTimecardEditor(@row.ID);" title="Add Hours">
+                            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                        </a>
+                    </td>
                 </tr>
             }
         </tbody>

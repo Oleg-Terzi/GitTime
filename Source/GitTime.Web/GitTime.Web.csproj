@@ -147,6 +147,7 @@
     <Compile Include="Infrastructure\GitHub\GitHubHelper.cs" />
     <Compile Include="Infrastructure\Helpers\GitTimeException.cs" />
     <Compile Include="Infrastructure\Helpers\NumberHelper.cs" />
+    <Compile Include="Infrastructure\Text\Markdown.cs" />
     <Compile Include="Infrastructure\Text\TextHelper.cs" />
     <Compile Include="Infrastructure\Web\GitTimeAuthenticationModule.cs" />
     <Compile Include="Infrastructure\Web\GitTimeUser.cs" />
@@ -188,6 +189,7 @@
     <Compile Include="Models\View\Issue\FinderModel.cs" />
     <Compile Include="Infrastructure\GitHub\Data\GitHubIssueFilter.cs" />
     <Compile Include="Models\View\Issue\SearchCriteriaModel.cs" />
+    <Compile Include="Models\View\Issue\ViewerModel.cs" />
     <Compile Include="Models\View\LoginModel.cs" />
     <Compile Include="Models\View\Person\EditorModel.cs" />
     <Compile Include="Models\View\Person\FinderModel.cs" />
