@@ -16,7 +16,7 @@
     });
 
     var _finder = {
-        search: function(isClear) {
+        search: function (isClear) {
             var form = $("#SearchCriteria form");
 
             form.validate();
@@ -47,6 +47,9 @@
 
             $("#SearchResults_PageIndex").val(pageIndex);
 
+            _finder.refresh();
+        },
+        refresh: function () {
             $.ajax({
                 type: "POST",
                 url: '@Url.Action("ChangePage")',

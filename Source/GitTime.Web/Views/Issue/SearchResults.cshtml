@@ -1,10 +1,39 @@
-﻿@using GitTime.Web.Infrastructure.GitHub.Data
+﻿@using GitTime.Web.Controllers
+@using GitTime.Web.Infrastructure.GitHub.Data
 @using GitTime.Web.Models.View.Issue
 
 @model FinderModel
 
 @{
     var _dataSource = (ICollection<GitHubIssueInfo>)ViewBag.DataSource;
+}
+
+@functions {
+    IHtmlString GetIssuePriorityHtml(IEnumerable<GitHubLabelInfo> labels)
+    {
+        if (labels.FirstOrDefault(l => String.Compare(l.Name, "urgent") == 0) != null)
+            return Html.Raw("<span style='color:#ff0000; cursor:default;' title='Urgent Priority' class='glyphicon glyphicon-exclamation-sign' aria-hidden='true'></span>");
+
+        if (labels.FirstOrDefault(l => String.Compare(l.Name, "nonessential") == 0) != null)
+            return Html.Raw("<span style='color:#009000; cursor:default;' title='Low Priority' class='glyphicon glyphicon-arrow-down' aria-hidden='true'></span>");
+
+        return null;
+    }
+    
+    IHtmlString GetIssueHours(Int32 number, String repo)
+    {
+        var result = 0.0M;
+        
+        var issueHours = (IEnumerable<ViewerModel.IssueHoursData>)ViewBag.IssueHours;
+        if (issueHours != null)
+        {
+            var hoursInfo = issueHours.FirstOrDefault(h => h.Number == number && h.RepositoryName == repo);
+            if (hoursInfo != null)
+                result = hoursInfo.Hours;
+        }
+
+        return Html.Raw(result.ToString("0.00"));
+    }
 }
 
 @Html.Partial("_SearchResultsHeader")
@@ -18,6 +47,7 @@
     <table class="table table-striped">
         <thead>
             <tr>
+                <th style="width:30px;"></th>
                 <th>Number</th>
                 <th>Repository</th>
                 <th>Summary</th>
@@ -31,25 +61,38 @@
             @foreach (GitHubIssueInfo row in _dataSource)
             {
                 <tr>
-                    <td>
-                        <a href="javascript:issueController.showViewer(@row.ID);" title="View">#@String.Format("{0:0000}", row.Number)</a> @(
-                            row.Labels.FirstOrDefault(l => String.Compare(l.Name, "urgent") == 0) != null
-                                ? Html.Raw("<span style='color:#ff0000; cursor:default;' title='Urgent Priority' class='glyphicon glyphicon-exclamation-sign' aria-hidden='true'></span>")
-                                : row.Labels.FirstOrDefault(l => String.Compare(l.Name, "nonessential") == 0) != null
-                                    ? Html.Raw("<span style='color:#009000; cursor:default;' title='Low Priority' class='glyphicon glyphicon-arrow-down' aria-hidden='true'></span>")
-                                    : null
-                        )
-                    </td>
+                    <td><a title="View on GitHub" target="_blank" href="@row.Url"><span class="glyphicon glyphicon-link"></span></a></td>
+                    <td><a href="javascript:issueController.showViewer(@row.ID, null);" title="View">#@String.Format("{0:0000}", row.Number)</a> @GetIssuePriorityHtml(row.Labels)</td>
                     <td>@row.Repository.Name</td>
                     <td>@row.Title</td>
+                    <td>@(row.User != null
+                            ? Html.Raw(
+                                String.Format(
+                                    "<a target='_blank' href='{2}' class='issue-user'><img alt='{0}' title='{0}' src='{1}'></a>",
+                                    row.User.LoginName,
+                                    row.User.AvatarUrl,
+                                    row.User.ProfileUrl
+                                )
+                              )
+                            : null
+                        ) @String.Format("{0:MMM d, yyyy}", row.CreatedOn)</td>
+                    <td>@(row.Assignee != null
+                            ? Html.Raw(
+                                String.Format(
+                                "<a target='_blank' href='{2}' class='issue-user'><img alt='{0}' title='{0}' src='{1}'></a>",
+                                    row.Assignee.LoginName,
+                                    row.Assignee.AvatarUrl,
+                                    row.Assignee.ProfileUrl
+                                )
+                              )
+                            : Html.Raw("<div style='display:inline-block; width:16px; height:16px;'></div>")
+                        ) @(row.ClosedOn.HasValue
+                            ? String.Format("{0:MMM d, yyyy} at {0:hh:mm tt}", row.ClosedOn)
+                            : null
+                        )</td>
+                    <td style="text-align:right;">@GetIssueHours(row.Number, row.Repository.FullName)</td>
                     <td>
-                        @(row.User != null ? Html.Raw(String.Format("<img alt='{0}' title='{0}' src='{1}' style='width:16px; height:16px;'>", row.User.LoginName, row.User.AvatarUrl)) : null)
-                        @String.Format("{0:MMM d, yyyy}", row.CreatedOn)
-                    </td>
-                    <td>@(row.ClosedOn.HasValue ? String.Format("{0:MMM d, yyyy} at {0:hh:mm tt}", row.ClosedOn) : null)</td>
-                    <td style="text-align:right;">0.0</td>
-                    <td>
-                        <a href="javascript:_finder.showTimecardEditor(@row.ID);" title="Add Hours">
+                        <a href="javascript:issueController.showViewer(@row.ID, 'hours');" title="Add Hours">
                             <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
                         </a>
                     </td>

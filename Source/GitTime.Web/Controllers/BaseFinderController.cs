@@ -4,7 +4,7 @@ using System.Net;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading.Tasks;
 using System.Web.Mvc;
-using GitTime.Web.Infrastructure.Helpers;
+
 using GitTime.Web.Models.View;
 
 namespace GitTime.Web.Controllers

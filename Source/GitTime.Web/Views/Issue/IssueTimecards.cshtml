@@ -1,0 +1,87 @@
+﻿@using GitTime.Web.Models.View.Issue
+@using GitTime.Web.Infrastructure.Web;
+
+@model ViewerModel
+
+@{
+    var gitTimeUser = GitTimeUser.Current;
+    var errorMessage = (String)ViewBag.ErrorMessage;
+}
+
+<h4>Hours</h4>
+
+@using (Html.BeginForm("CreateTimecard", null, null, FormMethod.Post, new { role = "form", id = "issue_timecard_form" }))
+{
+    @Html.HiddenFor(m => m.View.ID)
+    
+    <div class="alert alert-danger" role="alert" style="display:none;">
+        @if (errorMessage != null)
+        {
+            @(errorMessage)
+        }
+        else
+        {
+            @("Make sure all fields have valid values.")
+        }
+    </div>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th style="width:100px;">Date</th>
+                <th>Person</th>
+                <th style="text-align:right; width:80px;">Hours</th>
+                <th style="width:33px;"></th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @if (Model.View.Timecards != null && Model.View.Timecards.Length > 0)
+            {
+                foreach (var timecard in Model.View.Timecards)
+                {
+                    <tr>
+                        <td>@String.Format("{0:MMM d, yyyy}", @timecard.EntryDate)</td>
+                        <td>@timecard.PersonFirstName @timecard.PersonLastName</td>
+                        <td style="text-align:right;">@timecard.Hours.ToString("0.00")</td>
+                        <td>
+                            @if (timecard.PersonID == gitTimeUser.ID)
+                            {
+                                <a title="Remove Timecard" href="javascript:issueViewer.deleteTimecard(@timecard.ID);">
+                                    <span aria-hidden="true" class="glyphicon glyphicon-trash"></span>
+                                </a>
+                            }
+                        </td>
+                    </tr>
+                }
+            }
+            <tr>
+                <td>
+                    @Html.TextBoxFor(x => x.Timecard.EntryDate, "{0:MM\\/dd\\/yyyy}", new { type = "date", style = "width:100%;" })
+                    @{ Html.ValidateFor(x => x.Timecard.EntryDate); }
+                </td>
+                <td></td>
+                <td>
+                    @Html.TextBoxFor(x => x.Timecard.Hours, new { type = "number", style = "width:100%;" })
+                    @{ Html.ValidateFor(x => x.Timecard.Hours); }
+                </td>
+                <td>
+                    <a title="Add Timecard" href="javascript:issueViewer.saveTimecard();">
+                        <span aria-hidden="true" class="glyphicon glyphicon-plus-sign"></span>
+                    </a>
+                </td>
+            </tr>
+        </tbody>
+        @if (Model.View.Timecards != null && Model.View.Timecards.Length > 0)
+        {
+            <tfoot>
+                <tr>
+                    <td></td>
+                    <td style="text-align:right; font-weight:bold;">TOTAL:</td>
+                    <td style="text-align:right; font-weight:bold;">@Model.View.Timecards.Sum(t => t.Hours).ToString("0.00")</td>
+                    <td></td>
+                </tr>
+            </tfoot>
+        }
+    </table>
+}

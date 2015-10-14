@@ -11,6 +11,15 @@
     @Html.Partial("_Find")
 }
 
+@section HtmlHeader {
+    <style type="text/css">
+        a.issue-user > img {
+            width:16px;
+            height:16px;
+        }
+    </style>
+}
+
 @section SearchCriteria
 {
     <li class="dropdown">
@@ -49,22 +58,40 @@
 </div>
 
 <script type="text/javascript">
-        
+
     var issueController = {
-        showViewer: function (id) {
+        _refreshSearchResults: false,
+
+        showViewer: function (id, tab) {
+            issueController._refreshSearchResults = false;
+
             $.ajax({
                 type: "POST",
                 url: '@Url.Action("ViewIssue")',
-                data: { id: id },
+                data: { id: id, tab: tab },
                 success: function (data) {
                     _finder._init(data);
+                    $('#Editor.modal')
+                        .off('hidden.bs.modal', issueController.onViewerClosed)
+                        .on('hidden.bs.modal', issueController.onViewerClosed);
                 },
                 error: function (xhr) {
-                    var newDoc = document.open("text/html", "replace");
-                    newDoc.write(xhr.responseText);
-                    newDoc.close();
+                    if (xhr.responseText.indexOf("<!DOCTYPE") == 0) {
+                        var newDoc = document.open("text/html", "replace");
+                        newDoc.write(xhr.responseText);
+                        newDoc.close();
+                    } else {
+                        _finder._init(xhr.responseText);
+
+                        $("#Editor form .alert-danger").show();
+                    }
                 },
             });
+        },
+
+        onViewerClosed: function () {
+            if (issueController._refreshSearchResults)
+                _finder.refresh();
         },
     };
 

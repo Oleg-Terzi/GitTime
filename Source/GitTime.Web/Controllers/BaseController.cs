@@ -3,8 +3,6 @@ using System.Security.Principal;
 using System.Web.Mvc;
 using System.Web.Mvc.Filters;
 
-using GitTime.Web.Infrastructure.Helpers;
-
 namespace GitTime.Web.Controllers
 {
     public abstract class BaseController : Controller

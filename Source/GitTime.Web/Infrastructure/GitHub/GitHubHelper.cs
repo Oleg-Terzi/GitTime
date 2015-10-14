@@ -347,7 +347,7 @@ namespace GitTime.Web.Infrastructure.GitHub
                 var result = new GitHubIssueInfo();
 
                 result.ID = issue.id;
-                result.IssueUrl = issue.url;
+                result.Url = issue.html_url;
                 result.Number = issue.number;
                 result.Title = issue.title;
                 result.State = (GitHubIssueStateType)Enum.Parse(typeof(GitHubIssueStateType), issue.state, true);
@@ -371,6 +371,40 @@ namespace GitTime.Web.Infrastructure.GitHub
             #endregion
         }
 
+        private class JsonComment
+        {
+            public String url { get; set; }
+            public String html_url { get; set; }
+            public String issue_url { get; set; }
+            public Int32 id { get; set; }
+            public DateTime created_at { get; set; }
+            public DateTime? updated_at { get; set; }
+            public String body { get; set; }
+
+            public JsonUser user { get; set; }
+
+            #region Public methods
+
+            public static GitHubCommentInfo CreateInfo(JsonComment comment, GitHubContext context)
+            {
+                var result = new GitHubCommentInfo();
+
+                result.ID = comment.id;
+                result.Url = comment.html_url;
+                result.BodyText = comment.body;
+                result.CreatedOn = comment.created_at;
+                result.UpdatedOn = comment.updated_at;
+                result.Author = JsonUser.CreateInfo(comment.user, context);
+
+                if (context != null)
+                    result = context.AddComment(result);
+
+                return result;
+            }
+
+            #endregion
+        }
+
         #endregion
 
         #region Constants
@@ -383,6 +417,7 @@ namespace GitTime.Web.Infrastructure.GitHub
             public const String ApiUserEmails = "https://api.github.com/user/emails?access_token={0}";
             public const String ApiUser = "https://api.github.com/user?access_token={0}";
             public const String ApiIssues = "https://api.github.com/issues?filter=all&state=all&access_token={0}";
+            public const String ApiIssueComments = "https://api.github.com/repos/{1}/issues/{2}/comments?access_token={0}";
         }
 
         private const String StateSessionKey = "GitTime.Web.Infrastructure.Helpers.GitHubHelper.State";
@@ -502,6 +537,32 @@ namespace GitTime.Web.Infrastructure.GitHub
                 JsonIssue.CreateInfo(issue, context);
 
             return context;
+        }
+
+        public async static Task<GitHubIssueInfo> RequestIssueCommentsAsync(Int32 issueId, AccessToken accessToken, GitHubContext context)
+        {
+            GitHubIssueInfo issue;
+            if (!context.Issues.TryGetValue(issueId, out issue))
+                return null;
+
+            if (issue.Comments == null)
+            {
+                var issueComments = new List<GitHubCommentInfo>();
+
+                if (issue.CommentsCount > 0)
+                {
+                    var url = String.Format(UrlTemplates.ApiIssueComments, accessToken.Key, issue.Repository.FullName, issue.Number);
+                    var response = await GetResponseAsync(url, null);
+                    var comments = jsonSerializer.Deserialize<List<JsonComment>>(response);
+
+                    foreach (JsonComment comment in comments)
+                        issueComments.Add(JsonComment.CreateInfo(comment, context));
+                }
+
+                issue.Comments = issueComments.ToArray();
+            }
+
+            return issue;
         }
 
         #endregion

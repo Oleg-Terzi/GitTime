@@ -3,8 +3,7 @@ using System.Data.Entity;
 using System.Linq;
 using System.Security.Principal;
 using System.Threading.Tasks;
-using GitTime.Web;
-using GitTime.Web.Infrastructure.Web;
+
 using GitTime.Web.Models;
 using GitTime.Web.Models.Database;
 using GitTime.Web.Models.View;

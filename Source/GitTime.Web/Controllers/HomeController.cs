@@ -1,8 +1,7 @@
-﻿using System;
-using System.Security.Principal;
+﻿using System.Threading.Tasks;
 using System.Web.Mvc;
 
-using GitTime.Web;
+using GitTime.Web.Infrastructure.GitHub;
 
 namespace GitTime.Web.Controllers
 {
@@ -10,9 +9,13 @@ namespace GitTime.Web.Controllers
     {
         #region Actions
 
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
-            return RedirectToAction("Find", "Timecard");
+            var gitHubUser = await GitHubUser.GetCurrentAsync();
+
+            return gitHubUser.IsAuthenticated
+                ? RedirectToAction("Find", "Issue")
+                : RedirectToAction("Find", "Timecard");
         }
 
         #endregion

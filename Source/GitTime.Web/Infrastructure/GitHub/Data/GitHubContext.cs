@@ -14,6 +14,7 @@ namespace GitTime.Web.Infrastructure.GitHub.Data
         public IDictionary<Int32, GitHubIssueInfo> Issues { get; private set; }
         public IDictionary<String, GitHubLabelInfo> Labels { get; private set; }
         public IDictionary<Int32, GitHubRepositoryInfo> Repositories { get; private set; }
+        public IDictionary<Int32, GitHubCommentInfo> Comments { get; private set; }
 
         #endregion
 
@@ -25,6 +26,7 @@ namespace GitTime.Web.Infrastructure.GitHub.Data
             Issues = new Dictionary<Int32, GitHubIssueInfo>();
             Labels = new Dictionary<String, GitHubLabelInfo>();
             Repositories = new Dictionary<Int32, GitHubRepositoryInfo>();
+            Comments = new Dictionary<Int32, GitHubCommentInfo>();
         }
 
         #endregion
@@ -94,6 +96,23 @@ namespace GitTime.Web.Infrastructure.GitHub.Data
                 }
 
                 return Repositories[repository.ID];
+            }
+
+            return null;
+        }
+
+        public GitHubCommentInfo AddComment(GitHubCommentInfo comment)
+        {
+            if (comment != null)
+            {
+                if (!Comments.ContainsKey(comment.ID))
+                {
+                    Comments.Add(comment.ID, comment);
+
+                    return comment;
+                }
+
+                return Comments[comment.ID];
             }
 
             return null;

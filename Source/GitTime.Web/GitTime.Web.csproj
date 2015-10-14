@@ -133,6 +133,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Infrastructure\AppSettings.cs" />
+    <Compile Include="Infrastructure\GitHub\Data\GitHubCommentInfo.cs" />
     <Compile Include="Infrastructure\GitHub\Data\GitHubContext.cs" />
     <Compile Include="Infrastructure\GitHub\Data\GitHubIssueInfo.cs" />
     <Compile Include="Infrastructure\GitHub\Data\GitHubIssueStateType.cs" />
@@ -313,6 +314,7 @@
     <Content Include="Views\Issue\Find.cshtml" />
     <Content Include="Views\Issue\SearchResults.cshtml" />
     <Content Include="Views\Issue\View.cshtml" />
+    <Content Include="Views\Issue\IssueTimecards.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

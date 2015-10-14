@@ -10,7 +10,7 @@ namespace GitTime.Web.Infrastructure.GitHub.Data
         #region Simple properties
 
         public Int32 ID { get; set; }
-        public String IssueUrl { get; set; }
+        public String Url { get; set; }
         public Int32 Number { get; set; }
         public String Title { get; set; }
         public GitHubIssueStateType State { get; set; }
@@ -29,6 +29,7 @@ namespace GitTime.Web.Infrastructure.GitHub.Data
         public GitHubLabelInfo[] Labels { get; set; }
         public GitHubUserInfo Assignee { get; set; }
         public GitHubRepositoryInfo Repository { get; set; }
+        public GitHubCommentInfo[] Comments { get; set; }
 
         #endregion
     }
